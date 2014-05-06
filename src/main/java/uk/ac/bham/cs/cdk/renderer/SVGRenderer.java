@@ -8,6 +8,11 @@ package uk.ac.bham.cs.cdk.renderer;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import javax.vecmath.Point2d;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgent;
+import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.renderer.RendererModel;
@@ -19,6 +24,8 @@ import org.openscience.cdk.renderer.elements.LineElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.svg.SVGLocatable;
+import org.w3c.dom.svg.SVGRect;
 
 /**
  *
@@ -46,22 +53,47 @@ public class SVGRenderer extends AbstractRenderer<Node> {
        this.setStroke(new BasicStroke(1));
     }
     
+    @Override
+    protected Point2d WH(Node element) {
+        // create a temporary document and add the element
+        Document d = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
+        Node n = d.importNode(element, true);
+        d.getDocumentElement().appendChild(n);
+        
+        // setup a virtual browser if you will
+        UserAgent ua = new UserAgentAdapter();
+        DocumentLoader l = new DocumentLoader(ua);
+        BridgeContext bc = new BridgeContext(ua, l);
+        bc.setDynamicState(BridgeContext.DYNAMIC);
+        
+        // "render it"
+        GVTBuilder b = new GVTBuilder();
+        b.build(bc, d);
+        
+        // get the boundary of the result
+        SVGRect bbox = ((SVGLocatable) n).getBBox();
+
+        // return the points (x:width, y:height)
+        return new Point2d(bbox.getWidth(), bbox.getHeight());
+    }
+    
     /**
      * 
      * @param svgElement
      * @param element 
      */
-    private void setId(Node svgElement, IRenderingElement element) {
+    private void setId(Node node, IRenderingElement element) {
         try {
-            if(svgElement instanceof Element &&
+            if(node instanceof Element &&
                     element instanceof AbstractRenderingElement) {
-                ((Element) svgElement).setAttribute("id", ((AbstractRenderingElement) element).getRelatedChemicalObject().getID());
+                ((Element) node).setAttribute("id", ((AbstractRenderingElement) element).getRelatedChemicalObject().getID());
             }
         } catch(NullPointerException e) { }
     }
     
     @Override
     protected void setFill(Node element) {
+        // i only play with elements
         if(element instanceof Element) {
             ((Element) element).setAttribute("fill", "rgb(" + this.getColor().getRed() + ", " + this.getColor().getGreen() + ", " + this.getColor().getBlue() + ")");
         }
@@ -69,6 +101,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     @Override
     protected void setStroke(Node element) {
+        // i only play with elements
         if(element instanceof Element) {
             ((Element) element).setAttribute("stroke", "rgb(" + this.getColor().getRed() + ", " + this.getColor().getGreen() + ", " + this.getColor().getBlue() + ")");
             ((Element) element).setAttribute("stroke-width", Double.toString((double) ((BasicStroke) this.getStroke()).getLineWidth()));
@@ -77,38 +110,93 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     
     @Override
     public Node render(IRenderingElement element, IAtomContainer atomContainer, Double width, Double height) {
-        this.document = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
-        this.document.getDocumentElement().setAttribute("width", Double.toString(width));
-        this.document.getDocumentElement().setAttribute("height", Double.toString(height));
-        this.document.getDocumentElement().appendChild(super.render(element, atomContainer, width, height));
+        // create an SVG DOM document
+        Document doc = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
+        // set the height and width attributes
+        doc.getDocumentElement().setAttribute("width", Double.toString(width));
+        doc.getDocumentElement().setAttribute("height", Double.toString(height));
         
-        return document;
+        // store this document for 
+        // use within this render
+        this.document = doc;
+        
+        // add the resultant model to the document
+        doc.getDocumentElement().appendChild(super.render(element, atomContainer, width, height));
+
+        return doc;
     }
 
     @Override
     protected Node render(LineElement element) {
         Point2d point;
+        // create the line needed
         Element line = this.document.createElementNS(SVG_NS, "line");
         
+        // transform the points and set the attributes
         point = this.XY(element.firstPointX, element.firstPointY);
         line.setAttribute("x1", Double.toString(point.x));
         line.setAttribute("y1", Double.toString(point.y));
         
+        // transform the points and set the attributes
         point = this.XY(element.secondPointX, element.secondPointY);
         line.setAttribute("x2", Double.toString(point.x));
         line.setAttribute("y2", Double.toString(point.y));
         
+        // styling
         this.setStroke(line);
-        
-        this.setId(line, element);
         line.setAttribute("class", "bond");
+        
+        // if attached to IChemObject
+        this.setId(line, element);
         
         return line;
     }
 
     @Override
     protected Node render(AtomSymbolElement element) {
-        return null;
+        // create the required elements
+        Element group = this.document.createElementNS(SVG_NS, "g");
+        Element rect = this.document.createElementNS(SVG_NS, "rect");
+        Element text = this.document.createElementNS(SVG_NS, "text");
+        group.setAttribute("class", "atom");
+        // if attached to IChemObject
+        this.setId(group, element);
+        
+        // arrange them accordingly
+        group.appendChild(rect);
+        group.appendChild(text);
+        
+        // fill the background white
+        this.setColor(Color.WHITE);
+        this.setFill(rect);
+        
+        // set the text colour
+        this.setColor(element.color);
+        this.setFill(text);
+        // set the text attributes
+        // TODO configurable font-size
+        text.setAttribute("font-size", "15.0");
+        text.appendChild(this.document.createTextNode(element.text));
+        
+        // transform the given (x,y) coordinates
+        Point2d xy = this.XY(element.xCoord, element.yCoord);
+        
+        // get the width and height of the element
+        Point2d b = this.WH(text);
+        Double  w = b.x; // width
+        Double  h = b.y; // hight
+        
+        // setup the background
+        rect.setAttribute("x", Double.toString(xy.x - (w / 2) - (this.DEFAULT_XPAD / 4)));
+        rect.setAttribute("y", Double.toString(xy.y - (-h / 2) - h));
+        rect.setAttribute("width", Double.toString(w + this.DEFAULT_XPAD));
+        rect.setAttribute("height", Double.toString(h + this.DEFAULT_YPAD));
+        
+        // setup the text to be on top
+        text.setAttribute("x", Double.toString(xy.x - (w / 2)));
+        text.setAttribute("y", Double.toString(xy.y - (-h / 2)));
+        
+        return group;
     }
 
     @Override

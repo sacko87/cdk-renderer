@@ -40,6 +40,16 @@ public abstract class AbstractRenderer<T> {
     /**
      * 
      */
+    protected final double DEFAULT_XPAD = 4;
+    
+    /**
+     * 
+     */
+    protected final double DEFAULT_YPAD = 1;
+    
+    /**
+     * 
+     */
     private Color color;
 
     /**
@@ -233,6 +243,13 @@ public abstract class AbstractRenderer<T> {
     /**
      * 
      * @param element
+     * @return 
+     */
+    protected abstract Point2d WH(T element);
+    
+    /**
+     * 
+     * @param element
      * @param atomContainer
      * @param width
      * @param height
@@ -265,17 +282,29 @@ public abstract class AbstractRenderer<T> {
      * @return  
      */
     protected T render(IRenderingElement element) {
+        // save current colours/stroke
+        Color  pColor = this.getColor();
+        Stroke pStroke = this.getStroke();
+        
+        T result;
+        // generate the result
         if(element instanceof LineElement) {
-            return this.render((LineElement) element);
+            result = this.render((LineElement) element);
         } else if(element instanceof ElementGroup) {
-            return this.render((ElementGroup) element);
+            result = this.render((ElementGroup) element);
         } else if(element instanceof AtomSymbolElement) {
-            return this.render((AtomSymbolElement) element);
+            result = this.render((AtomSymbolElement) element);
         } else {
             throw new UnsupportedOperationException(
                     "The rendering of " + element.getClass().getCanonicalName()
                             + " is not supported.");
         }
+        
+        // restore the colours/strokes
+        this.setColor(pColor);
+        this.setStroke(pStroke);
+        
+        return result;
     }
     
     /**
