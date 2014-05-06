@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<molecule id="m1" xmlns="http://www.xml-cml.org/schema">
+<molecule xmlns="http://www.xml-cml.org/schema" xmlns:sre="http://www.chemaccess.org/sre-schema">
  <atomArray>
   <atom id="a1" elementType="C" x2="0.652600" y2="0.751200"/>
   <atom id="a2" elementType="C" x2="0.652600" y2="-0.751200"/>
@@ -28,4 +28,25 @@
   <bond atomRefs2="a7 a8" order="1" id="b8"/>
   <bond atomRefs2="a8 a9" order="1" id="b9"/>
  </bondArray>
+ <atomSet atomRefs="a1 a2 a3 a4 a5 a6" name="Benzene ring" id="as1"/>
+ <atomSet atomRefs="a1 a7 a8 a9" name="Butane" id="as2"/>
+<sre:desc sre:level="1">
+  <sre:subdesc sre:level="1" sre:elements="a9 a8 b9">single bond between C atoms at position 9 and 8</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a8 a7 b8">single bond between C atoms at position 8 and 7</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a7 a1 b7">single bond between C atoms at position 7 and 1</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a1 a2 b1">Cis double bond between C atoms at position 1 and 2</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a2 a3 b2">single bond between C atoms at position 2 and 3</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a3 a4 b3">Cis double bond between C atoms at position 3 and 4</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a4 a5 b4">single bond between C atoms at position 4 and 5</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a5 a6 b5">Cis double bond between C atom at position 5 and 6</sre:subdesc>
+  <sre:subdesc sre:level="1" sre:elements="a6 a1 b6">single bond between C atoms at position 6 and 1</sre:subdesc>
+</sre:desc>
+<sre:desc sre:level="2">
+  <sre:subdesc sre:level="2" sre:elements="a9 a8 a7 a1 b7 b8 b9">Butane</sre:subdesc>
+  <sre:subdesc sre:level="2" sre:elements="">connected to</sre:subdesc>
+  <sre:subdesc sre:level="2" sre:elements="a1 a2 a3 a4 a5 a6 b1 b2 b3 b4 b5 b6">Benzene ring</sre:subdesc>
+</sre:desc>
+<sre:desc sre:level="3">
+  <sre:subdesc sre:level="3" sre:elements="a1 a2 a3 a4 a5 a6 a7 a8 a9 b1 b2 b3 b4 b5 b6 b7 b8 b9">The proper name</sre:subdesc>
+</sre:desc>
 </molecule>
