@@ -52,6 +52,12 @@
             <artifactId>batik-svg-dom</artifactId>
             <version>1.6-1</version>
         </dependency>
+        <dependency>
+            <groupId>batik</groupId>
+            <artifactId>batik-bridge</artifactId>
+            <version>1.6-1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
