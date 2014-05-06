@@ -174,8 +174,8 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         this.setColor(element.color);
         this.setFill(text);
         // set the text attributes
-        // TODO configurable font-size
-        text.setAttribute("font-size", "15.0");
+        text.setAttribute("font-family", this.DEFAULT_FONT.getFamily());
+        text.setAttribute("font-size", Double.toString(this.DEFAULT_FONT.getSize2D() * this.getZoom()) + "px");
         text.appendChild(this.document.createTextNode(element.text));
         
         // transform the given (x,y) coordinates
@@ -187,10 +187,10 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         Double  h = b.y; // hight
         
         // setup the background
-        rect.setAttribute("x", Double.toString(xy.x - (w / 2) - (this.DEFAULT_XPAD / 4)));
+        rect.setAttribute("x", Double.toString(xy.x - (w / 2) - ((this.DEFAULT_XPAD * this.getZoom()) / 4)));
         rect.setAttribute("y", Double.toString(xy.y - (-h / 2) - h));
-        rect.setAttribute("width", Double.toString(w + this.DEFAULT_XPAD));
-        rect.setAttribute("height", Double.toString(h + this.DEFAULT_YPAD));
+        rect.setAttribute("width", Double.toString(w + (this.DEFAULT_XPAD * this.getZoom())));
+        rect.setAttribute("height", Double.toString(h + (this.DEFAULT_YPAD * this.getZoom())));
         
         // setup the text to be on top
         text.setAttribute("x", Double.toString(xy.x - (w / 2)));

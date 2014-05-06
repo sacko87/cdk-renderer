@@ -9,6 +9,7 @@ package uk.ac.bham.cs.cdk.renderer;
 // i'm being nice
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -46,7 +47,12 @@ public abstract class AbstractRenderer<T> {
      * 
      */
     protected final double DEFAULT_YPAD = 1;
-    
+        
+    /**
+     * 
+     */
+    protected final Font DEFAULT_FONT = new Font("serif", Font.PLAIN, 15);
+
     /**
      * 
      */
