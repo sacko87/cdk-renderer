@@ -41,12 +41,12 @@ public abstract class AbstractRenderer<T> {
     /**
      * 
      */
-    protected final double DEFAULT_XPAD = 4;
+    protected final double DEFAULT_XPAD = 2;
     
     /**
      * 
      */
-    protected final double DEFAULT_YPAD = 1;
+    protected final double DEFAULT_YPAD = 2;
         
     /**
      * 

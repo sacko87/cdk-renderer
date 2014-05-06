@@ -187,8 +187,8 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         Double  h = b.y; // hight
         
         // setup the background
-        rect.setAttribute("x", Double.toString(xy.x - (w / 2) - ((this.DEFAULT_XPAD * this.getZoom()) / 4)));
-        rect.setAttribute("y", Double.toString(xy.y - (-h / 2) - h));
+        rect.setAttribute("x", Double.toString(xy.x - (w / 2) - ((this.DEFAULT_XPAD * this.getZoom()) / 2)));
+        rect.setAttribute("y", Double.toString(xy.y - (-h / 2) - h - ((this.DEFAULT_YPAD * this.getZoom()) / 2)));
         rect.setAttribute("width", Double.toString(w + (this.DEFAULT_XPAD * this.getZoom())));
         rect.setAttribute("height", Double.toString(h + (this.DEFAULT_YPAD * this.getZoom())));
         
