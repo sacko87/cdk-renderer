@@ -46,7 +46,7 @@ import uk.ac.bham.cs.cdk.renderer.generators.BasicBondGenerator;
  *
  * @author John T. Saxon
  */
-public class BulkSVGRendererTest {
+public class SVGRendererTest {
     /**
      * 
      */
@@ -65,7 +65,7 @@ public class BulkSVGRendererTest {
     /**
      * 
      */
-    public BulkSVGRendererTest() {
+    public SVGRendererTest() {
         // create the render model (configuration)
         RendererModel rendererModel = new RendererModel();
 
@@ -95,7 +95,7 @@ public class BulkSVGRendererTest {
             // calculate the coordinates
             sdg.generateCoordinates();
         } catch (CDKException ex) {
-            Logger.getLogger(BulkSVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
             Assert.fail();
         }
 
@@ -103,11 +103,11 @@ public class BulkSVGRendererTest {
         mole = sdg.getMolecule();
         if(mole != null) {
             // render the molecule
-            Document doc = (Document) this.renderer.render(mole, BulkSVGRendererTest.DEFAULT_WIDTH, BulkSVGRendererTest.DEFAULT_HEIGHT);
+            Document doc = (Document) this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
             Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
 
             // write it to the file
-            Boolean b = BulkSVGRendererTest.this.toFile(doc, /* fake path */ Paths.get("cml/triazole.cml"));
+            Boolean b = SVGRendererTest.this.toFile(doc, /* fake path */ Paths.get("cml/triazole.cml"));
             Assert.assertEquals(Boolean.TRUE, b);
         }
     }
@@ -127,15 +127,15 @@ public class BulkSVGRendererTest {
                 // are we looking at a CML file?
                 if(attrs.isRegularFile() && file.toString().toLowerCase().endsWith(".cml")) {
                     // read in the molecule from the CML
-                    IAtomContainer mole = BulkSVGRendererTest.this.fromFile(file);
+                    IAtomContainer mole = SVGRendererTest.this.fromFile(file);
                     Assert.assertNotEquals("Failed to get an IAtomContainer instance.", null, mole);
                     if(mole != null) {
                         // render the molecule
-                        Document doc = (Document) BulkSVGRendererTest.this.renderer.render(mole, BulkSVGRendererTest.DEFAULT_WIDTH, BulkSVGRendererTest.DEFAULT_HEIGHT);
+                        Document doc = (Document) SVGRendererTest.this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
                         Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
                         
                         // write it to the file
-                        Boolean b = BulkSVGRendererTest.this.toFile(doc, file);
+                        Boolean b = SVGRendererTest.this.toFile(doc, file);
                         Assert.assertEquals(Boolean.TRUE, b);
                     }
                 }
@@ -171,9 +171,9 @@ public class BulkSVGRendererTest {
             
             return true;
         } catch (TransformerConfigurationException ex) {
-            Logger.getLogger(BulkSVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (TransformerException ex) {
-            Logger.getLogger(BulkSVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return false;
@@ -195,7 +195,7 @@ public class BulkSVGRendererTest {
             mole = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);
         } catch (FileNotFoundException | CDKException | NullPointerException ex) {
             // lets assume this didn't work
-            Logger.getLogger(BulkSVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return mole;
