@@ -52,7 +52,7 @@ public class SVGRendererTest {
         mole = sdg.getMolecule();
         
         // create the "generators"
-        List<IGenerator<IAtomContainer>> generators
+        List<IGenerator> generators
                 = new ArrayList<>();
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
@@ -60,7 +60,7 @@ public class SVGRendererTest {
 
         // we need a renderer model
         RendererModel rendererModel = new RendererModel();
-
+        /*
         // register all generators to the model
         for (IGenerator<IAtomContainer> generator : generators) {
             rendererModel.registerParameters(generator);
@@ -70,10 +70,10 @@ public class SVGRendererTest {
         ElementGroup diagram = new ElementGroup();
         for (IGenerator<IAtomContainer> generator : generators) {
             diagram.add(generator.generate(mole, rendererModel));
-        }
+        }*/
         
-        SVGRenderer r = new SVGRenderer(rendererModel);
-        Document d = (Document) r.render(diagram, mole, 200.0, 200.0);
+        SVGRenderer r = new SVGRenderer(rendererModel, generators);
+        Document d = (Document) r.render(mole, 200.0, 200.0);
         
         SVGRendererTest.toFile("triazole.svg", d);
     }
@@ -103,7 +103,7 @@ public class SVGRendererTest {
         mole = acs.getAtomContainer(0);
         
         // create the "generators"
-        List<IGenerator<IAtomContainer>> generators
+        List<IGenerator> generators
                 = new ArrayList<>();
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
@@ -111,7 +111,7 @@ public class SVGRendererTest {
 
         // we need a renderer model
         RendererModel rendererModel = new RendererModel();
-
+        /**
         // register all generators to the model
         for (IGenerator<IAtomContainer> generator : generators) {
             rendererModel.registerParameters(generator);
@@ -122,9 +122,10 @@ public class SVGRendererTest {
         for (IGenerator<IAtomContainer> generator : generators) {
             diagram.add(generator.generate(mole, rendererModel));
         }
+        */
         
-        SVGRenderer r = new SVGRenderer(rendererModel);
-        Document d = (Document) r.render(diagram, mole, 200.0, 200.0);
+        SVGRenderer r = new SVGRenderer(rendererModel, generators);
+        Document d = (Document) r.render(mole, 400.0, 400.0);
         
         SVGRendererTest.toFile("example.svg", d);
     }

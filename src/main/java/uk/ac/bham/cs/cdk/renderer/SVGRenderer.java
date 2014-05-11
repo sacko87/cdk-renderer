@@ -7,6 +7,7 @@ package uk.ac.bham.cs.cdk.renderer;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.util.List;
 import javax.vecmath.Point2d;
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.bridge.DocumentLoader;
@@ -21,6 +22,7 @@ import org.openscience.cdk.renderer.elements.AtomSymbolElement;
 import org.openscience.cdk.renderer.elements.ElementGroup;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.renderer.elements.LineElement;
+import org.openscience.cdk.renderer.generators.IGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,9 +47,10 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     /**
      * 
      * @param model
+     * @param generators
      */
-    public SVGRenderer(RendererModel model) {
-       super(model);
+    public SVGRenderer(RendererModel model, List<IGenerator> generators) {
+       super(model, generators);
        // set defaults
        this.setColor(Color.black);
        this.setStroke(new BasicStroke(1));
@@ -114,7 +117,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
     
     @Override
-    public Node render(IRenderingElement element, IAtomContainer atomContainer, Double width, Double height) {
+    public Node render(IAtomContainer atomContainer, Double width, Double height) {
         // create an SVG DOM document
         Document doc = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
         // set the height and width attributes
@@ -125,8 +128,11 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         // use within this render
         this.document = doc;
         
-        // add the resultant model to the document
-        doc.getDocumentElement().appendChild(super.render(element, atomContainer, width, height));
+        Node result = super.render(atomContainer, width, height);
+        if(result != null) {
+            // add the resultant model to the document
+            doc.getDocumentElement().appendChild(result);
+        }
 
         return doc;
     }

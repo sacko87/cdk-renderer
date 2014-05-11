@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 import javax.vecmath.Point2d;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -25,6 +26,7 @@ import org.openscience.cdk.renderer.elements.LineElement;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.Scale;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.ZoomFactor;
+import org.openscience.cdk.renderer.generators.IGenerator;
 
 /**
  *
@@ -82,28 +84,26 @@ public abstract class AbstractRenderer<T> {
      * 
      */
     private Point2d drawingCentre = new Point2d(100, 100);
+    
+    /**
+     * 
+     */
+    private final List<IGenerator> generators;
 
     /**
      * 
      * @param model 
      */
-    protected AbstractRenderer(RendererModel model) {
+    protected AbstractRenderer(RendererModel model, List<IGenerator> generators) {
         this.model = model;
+        this.generators = generators;
+        for(IGenerator generator: this.generators) {
+            this.model.registerParameters(generator);
+        }
+        
         this.updateTransformer();
     }
 
-    /**
-     * 
-     */
-    protected final void updateTransformer() {
-        this.transform = new AffineTransform();
-        this.transform.translate(this.drawingCentre.x, this.drawingCentre.y);
-        this.transform.scale(1, -1);
-        this.transform.scale(this.getScale(), this.getScale());
-        this.transform.scale(this.getZoom(), this.getZoom());
-        this.transform.translate(-this.modelCentre.x, -this.modelCentre.y);
-    }
-    
     /**
      * 
      * @return 
@@ -190,22 +190,6 @@ public abstract class AbstractRenderer<T> {
     }
     
     /**
-     * Given a bond length for a model, calculate the scale that will transform
-     * this length to the on screen bond length in RendererModel.
-     *
-     * @param bondLenght the average bond length of the model
-     * @return the scale necessary to transform this to a screen bond
-     */
-    public double calculateScaleForBondLength(Double bondLenght) {
-        if (Double.isNaN(bondLenght) || bondLenght == 0) {
-            return DEFAULT_SCALE;
-        } else {
-            return getModel().getParameter(
-                    BasicSceneGenerator.BondLength.class).getValue() / bondLenght;
-        }
-    }
-    
-    /**
      * 
      * @return 
      */
@@ -228,6 +212,14 @@ public abstract class AbstractRenderer<T> {
      */
     public RendererModel getModel() {
         return this.model;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public List<IGenerator> getGenerators() {
+        return this.generators;
     }
     
     /**
@@ -255,16 +247,49 @@ public abstract class AbstractRenderer<T> {
     
     /**
      * 
-     * @param element
+     */
+    protected final void updateTransformer() {
+        this.transform = new AffineTransform();
+        this.transform.translate(this.drawingCentre.x, this.drawingCentre.y);
+        this.transform.scale(1, -1);
+        this.transform.scale(this.getScale(), this.getScale());
+        this.transform.scale(this.getZoom(), this.getZoom());
+        this.transform.translate(-this.modelCentre.x, -this.modelCentre.y);
+    }
+    
+    /**
+     * Given a bond length for a model, calculate the scale that will transform
+     * this length to the on screen bond length in RendererModel.
+     *
+     * @param bondLenght the average bond length of the model
+     * @return the scale necessary to transform this to a screen bond
+     */
+    public double calculateScaleForBondLength(Double bondLenght) {
+        if (Double.isNaN(bondLenght) || bondLenght == 0) {
+            return DEFAULT_SCALE;
+        } else {
+            return getModel().getParameter(
+                    BasicSceneGenerator.BondLength.class).getValue() / bondLenght;
+        }
+    }
+    
+    /**
+     * 
      * @param atomContainer
      * @param width
      * @param height
      * @return 
      */
-    public T render(IRenderingElement element, IAtomContainer atomContainer, Double width, Double height) {
+    public T render(IAtomContainer atomContainer, Double width, Double height) {
+        this.setScale(atomContainer);
         this.setDrawingCentre(new Point2d(width / 2, height / 2));
         
-        return this.render(element, atomContainer);
+        ElementGroup diagram = new ElementGroup();
+        for(IGenerator generator: this.getGenerators()) {
+            diagram.add(generator.generate(atomContainer, this.getModel()));
+        }
+        
+        return this.render(diagram, atomContainer);
     }
     
     /**
@@ -274,8 +299,6 @@ public abstract class AbstractRenderer<T> {
      * @return 
      */
     protected T render(IRenderingElement element, IAtomContainer atomContainer) {
-        this.setScale(atomContainer);
-        
         Rectangle2D boundBox = BoundsCalculator.calculateBounds(atomContainer);
         this.setModelCentre(new Point2d(boundBox.getCenterX(), boundBox.getCenterY()));
         
