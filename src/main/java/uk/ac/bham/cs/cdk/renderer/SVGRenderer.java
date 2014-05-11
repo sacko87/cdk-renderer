@@ -86,7 +86,12 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         try {
             if(node instanceof Element &&
                     element instanceof AbstractRenderingElement) {
-                ((Element) node).setAttribute("id", ((AbstractRenderingElement) element).getRelatedChemicalObject().getID());
+                // do some casting
+                Element _node = (Element) node;
+                AbstractRenderingElement renderingElement = (AbstractRenderingElement) element;
+                
+                // add some attributes
+                _node.setAttribute("id", renderingElement.getRelatedChemicalObject().getID());
             }
         } catch(NullPointerException e) { }
     }
@@ -169,6 +174,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         // fill the background white
         this.setColor(Color.WHITE);
         this.setFill(rect);
+        this.setStroke(rect);
         
         // set the text colour
         this.setColor(element.color);
@@ -176,8 +182,10 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         // set the text attributes
         text.setAttribute("font-family", this.DEFAULT_FONT.getFamily());
         text.setAttribute("font-size", Double.toString(this.DEFAULT_FONT.getSize2D() * this.getZoom()) + "px");
-        text.appendChild(this.document.createTextNode(element.text));
         
+        // add the atom
+        text.appendChild(this.document.createTextNode(element.text));
+
         // transform the given (x,y) coordinates
         Point2d xy = this.XY(element.xCoord, element.yCoord);
         
