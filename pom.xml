@@ -64,6 +64,21 @@
             <version>2.0.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openscience.cdk</groupId>
+            <artifactId>cdk-interfaces</artifactId>
+            <version>1.5.5</version>
+            <type>jar</type>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>cdk</groupId>
+            <artifactId>cdk-interfaces</artifactId>
+            <version>1.0.4-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        -->
+        
     </dependencies>
     <repositories>
         <repository>

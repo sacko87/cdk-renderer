@@ -35,6 +35,8 @@ import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.io.CMLReader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator.ShowEndCarbons;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator.ShowExplicitHydrogens;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.templates.MoleculeFactory;
@@ -55,12 +57,12 @@ public class SVGRendererTest {
     /**
      * 
      */
-    protected static final Double DEFAULT_WIDTH = 400.0;
+    protected static final Double DEFAULT_WIDTH = 200.0;
     
     /**
      * 
      */
-    protected static final Double DEFAULT_HEIGHT = 400.0;
+    protected static final Double DEFAULT_HEIGHT = 200.0;
     
     /**
      * 
@@ -75,9 +77,12 @@ public class SVGRendererTest {
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
         generators.add(new BasicAtomGenerator());
-
+        
         // setup the renderer
         this.renderer = new SVGRenderer(rendererModel, generators);
+        // add my options
+        this.renderer.getModel().set(ShowExplicitHydrogens.class, true);
+        this.renderer.getModel().set(ShowEndCarbons.class, true);
     }
     
     /**
@@ -130,8 +135,14 @@ public class SVGRendererTest {
                     IAtomContainer mole = SVGRendererTest.this.fromFile(file);
                     Assert.assertNotEquals("Failed to get an IAtomContainer instance.", null, mole);
                     if(mole != null) {
+                        Document doc = null;
+                        try {
                         // render the molecule
-                        Document doc = (Document) SVGRendererTest.this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
+                            doc = (Document) SVGRendererTest.this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
+                        } catch(IllegalArgumentException e) {
+                            // to show which file threw the exception
+                            throw new IllegalArgumentException(file.toString(), e);
+                        }
                         Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
                         
                         // write it to the file

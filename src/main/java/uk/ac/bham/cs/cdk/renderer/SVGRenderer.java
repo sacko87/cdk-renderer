@@ -22,8 +22,11 @@ import org.openscience.cdk.renderer.elements.AtomSymbolElement;
 import org.openscience.cdk.renderer.elements.ElementGroup;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.renderer.elements.LineElement;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
+import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.svg.SVGLocatable;
@@ -189,8 +192,47 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         text.setAttribute("font-family", this.DEFAULT_FONT.getFamily());
         text.setAttribute("font-size", Double.toString(this.DEFAULT_FONT.getSize2D() * this.getZoom()) + "px");
         
-        // add the atom
-        text.appendChild(this.document.createTextNode(element.text));
+        Boolean showExplicitHydrogens =
+                this.getModel().hasParameter(BasicAtomGenerator.ShowExplicitHydrogens.class)
+                    ? this.getModel().get(BasicAtomGenerator.ShowExplicitHydrogens.class)
+                    : this.getModel().getDefault(BasicAtomGenerator.ShowExplicitHydrogens.class);
+        
+        // create a fragement
+        DocumentFragment df = this.document.createDocumentFragment();
+        // create the core text for the atom
+        Node elem = text.appendChild(this.document.createTextNode(element.text));
+        // do we want to show explicitly the hydogen counts?
+        // do we have any?
+        if(showExplicitHydrogens && element.hydrogenCount > 0) {
+            // room for the hydrogen
+            DocumentFragment Hx = this.document.createDocumentFragment();
+            // create the hydrogen atom
+            Hx.appendChild(this.document.createTextNode("H"));
+            // is there more than one?
+            if(element.hydrogenCount > 1) {
+                // create some space
+                Element n = this.document.createElementNS(SVG_NS, "tspan");
+                n.setAttribute("baseline-shift", "sub");
+                // add the count to it
+                n.appendChild(this.document.createTextNode(Integer.toString(element.hydrogenCount)));
+                Hx.appendChild(n);
+            }
+            
+            // before or after
+            // add elements in order
+            if(element.alignment == 2) {
+                df.appendChild(elem);
+                df.appendChild(Hx);
+            } else {
+                df.appendChild(Hx);
+                df.appendChild(elem);
+            }
+        } else {
+            // just add atom
+            df.appendChild(elem);
+        }
+        
+        text.appendChild(df);
 
         // transform the given (x,y) coordinates
         Point2d xy = this.XY(element.xCoord, element.yCoord);
