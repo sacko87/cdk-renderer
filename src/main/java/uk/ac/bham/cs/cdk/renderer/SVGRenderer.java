@@ -52,7 +52,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
      * @param model
      * @param generators
      */
-    public SVGRenderer(RendererModel model, List<IGenerator> generators) {
+    public SVGRenderer(RendererModel model, List<IGenerator<IAtomContainer>> generators) {
        super(model, generators);
        // set defaults
        this.setColor(Color.black);

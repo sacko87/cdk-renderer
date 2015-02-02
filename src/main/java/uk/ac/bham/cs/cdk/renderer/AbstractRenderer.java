@@ -88,16 +88,16 @@ public abstract class AbstractRenderer<T> {
     /**
      * 
      */
-    private final List<IGenerator> generators;
+    private final List<IGenerator<IAtomContainer>> generators;
 
     /**
      * 
      * @param model 
      */
-    protected AbstractRenderer(RendererModel model, List<IGenerator> generators) {
+    protected AbstractRenderer(RendererModel model, List<IGenerator<IAtomContainer>> generators) {
         this.model = model;
         this.generators = generators;
-        for(IGenerator generator: this.generators) {
+        for(IGenerator<IAtomContainer> generator: this.generators) {
             this.model.registerParameters(generator);
         }
         
@@ -218,7 +218,7 @@ public abstract class AbstractRenderer<T> {
      * 
      * @return 
      */
-    public List<IGenerator> getGenerators() {
+    public List<IGenerator<IAtomContainer>> getGenerators() {
         return this.generators;
     }
     
@@ -285,7 +285,7 @@ public abstract class AbstractRenderer<T> {
         this.setDrawingCentre(new Point2d(width / 2, height / 2));
         
         ElementGroup diagram = new ElementGroup();
-        for(IGenerator generator: this.getGenerators()) {
+        for(IGenerator<IAtomContainer> generator: this.getGenerators()) {
             diagram.add(generator.generate(atomContainer, this.getModel()));
         }
         
