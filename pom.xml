@@ -35,7 +35,7 @@
         <configuration>
 	  <programs>
 	    <program>
-	      <mainClass>uk.ac.bham.cs.cdk.App</mainClass>
+	      <mainClass>uk.ac.bham.cs.cdk.renderer.App</mainClass>
 	      <name>render</name>
 	    </program>
 	  </programs>
@@ -69,6 +69,11 @@
       <version>1.6-1</version>
       <type>jar</type>
     </dependency>
+    <dependency>        
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.2</version>
+      </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
