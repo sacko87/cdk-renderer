@@ -89,8 +89,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
      * @param element 
      */
     private void setId(Node node, IRenderingElement element) {
-        System.out.println("Instance of the abstract rendering element? " +
-                           (element instanceof AbstractRenderingElement));
         try {
             if(node instanceof Element &&
                     element instanceof AbstractRenderingElement) {

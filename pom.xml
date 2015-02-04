@@ -24,24 +24,27 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>1.9</version>
         <executions>
-	  <execution>
-	    <goals>
-	      <goal>assemble</goal>
-	    </goals>
-	  </execution>
+          <execution>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+          </execution>
         </executions>
         <configuration>
-	  <programs>
-	    <program>
-	      <mainClass>uk.ac.bham.cs.cdk.renderer.App</mainClass>
-	      <name>render</name>
-	    </program>
-	  </programs>
-	  <binFileExtensions>
-	    <unix>.sh</unix>
-	  </binFileExtensions>
+          <repositoryLayout>flat</repositoryLayout>
+          <useAsterikClassPath>true</useAsterikClassPath>
+          <projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
+          <programs>
+            <program>
+              <mainClass>uk.ac.bham.cs.cdk.renderer.App</mainClass>
+              <name>render</name>
+            </program>
+          </programs>
+          <binFileExtensions>
+            <unix>.sh</unix>
+          </binFileExtensions>
         </configuration>
       </plugin>
     </plugins>
@@ -82,7 +85,7 @@
     <dependency>
       <groupId>org.openscience.cdk</groupId>
       <artifactId>cdk-interfaces</artifactId>
-      <version>1.5.5</version>
+      <version>1.5.7</version>
       <type>jar</type>
     </dependency>
     <!--
