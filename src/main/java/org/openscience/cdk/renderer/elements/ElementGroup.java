@@ -47,6 +47,7 @@ public class ElementGroup
      * Create an empty element group.
      */
     public ElementGroup() {
+        System.out.println("This is our element group!");
         elements = new ArrayList<IRenderingElement>();
     }
 

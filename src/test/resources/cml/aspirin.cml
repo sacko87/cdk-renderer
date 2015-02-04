@@ -1,0 +1,32 @@
+<molecule id="m1" title="Molfile aspirin-skeletal-new.tif" xmlns="http://www.xml-cml.org/schema" xmlns:sre="http://www.chemaccess.org/sre-schema">
+    <atomArray>
+        <atom id="a1" elementType="C" x2="1.4301" y2="-0.6083" formalCharge="0" hydrogenCount="3"/>
+        <atom id="a2" elementType="C" x2="-0.4599" y2="-1.6683" formalCharge="0" hydrogenCount="1"/>
+        <atom id="a3" elementType="C" x2="0.8201" y2="-0.9483" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a4" elementType="C" x2="-1.6699" y2="-0.9683" formalCharge="0" hydrogenCount="1"/>
+        <atom id="a5" elementType="C" x2="-1.0599" y2="-0.6083" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a6" elementType="C" x2="-1.0599" y2="0.1217" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a7" elementType="C" x2="-1.6699" y2="-1.6583" formalCharge="0" hydrogenCount="1"/>
+        <atom id="a8" elementType="C" x2="-0.4499" y2="-0.9683" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a9" elementType="C" x2="-1.0699" y2="-2.0183" formalCharge="0" hydrogenCount="1"/>
+        <atom id="a10" elementType="O" x2="-0.6199" y2="0.3917" formalCharge="0" hydrogenCount="1"/>
+        <atom id="a11" elementType="O" x2="0.8201" y2="-1.4883" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a12" elementType="O" x2="0.1901" y2="-0.6983" formalCharge="0" hydrogenCount="0"/>
+        <atom id="a13" elementType="O" x2="-1.5299" y2="0.3917" formalCharge="0" hydrogenCount="0"/>
+    </atomArray>
+    <bondArray>
+        <bond id="b1" atomRefs2="a3 a1" order="S"/>
+        <bond id="b2" atomRefs2="a5 a4" order="S"/>
+        <bond id="b3" atomRefs2="a6 a5" order="S"/>
+        <bond id="b4" atomRefs2="a7 a4" order="D"/>
+        <bond id="b5" atomRefs2="a8 a2" order="S"/>
+        <bond id="b6" atomRefs2="a8 a5" order="D"/>
+        <bond id="b7" atomRefs2="a9 a2" order="D"/>
+        <bond id="b8" atomRefs2="a9 a7" order="S"/>
+        <bond id="b9" atomRefs2="a10 a6" order="S"/>
+        <bond id="b10" atomRefs2="a11 a3" order="D"/>
+        <bond id="b11" atomRefs2="a12 a3" order="S"/>
+        <bond id="b12" atomRefs2="a12 a8" order="S"/>
+        <bond id="b13" atomRefs2="a13 a6" order="D"/>
+    </bondArray>
+</molecule>

@@ -23,13 +23,16 @@ public class App {
         RendererModel rendererModel = new RendererModel();
 
         // create the "generators"
-        List<IGenerator<IAtomContainer>> generators
-            = new ArrayList<>();
+        List<IGenerator<IAtomContainer>> generators = new ArrayList<>();
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
         generators.add(new BasicAtomGenerator());
+        SVGRenderer renderer = new SVGRenderer(rendererModel, generators);
+        // add my options
+        renderer.getModel().set(BasicAtomGenerator.ShowExplicitHydrogens.class, true);
+        renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
 	for (String file : Cli.getFiles()) {
-	    FileHandler.translateFile(file, new SVGRenderer(rendererModel, generators));
+	    FileHandler.translateFile(file, renderer);
         }
     }
 }

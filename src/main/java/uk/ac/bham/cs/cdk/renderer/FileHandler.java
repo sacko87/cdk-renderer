@@ -48,9 +48,9 @@ import java.io.IOException;
 
 public class FileHandler {
 
-    protected static final double DEFAULT_WIDTH = 200.;
-    protected static final double DEFAULT_HEIGHT = 200.;
-    
+    protected static final double DEFAULT_WIDTH = 400.;
+    protected static final double DEFAULT_HEIGHT = 400.;
+
     /**
      * 
      * @param document
