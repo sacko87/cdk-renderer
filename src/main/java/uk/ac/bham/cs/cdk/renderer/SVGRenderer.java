@@ -170,34 +170,30 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
 
     protected Node render(WedgeLineElement element) {
-        Double startX, startY, endX, endY;
+        Point2d start, end;
         System.out.println(element.type);
         switch (element.direction) {
         case toFirst:
-            startX = element.secondPointX;
-            startY = element.secondPointY;
-            endX = element.firstPointX;
-            endY = element.firstPointY;
+            start = this.XY(element.secondPointX, element.secondPointY);
+            end = this.XY(element.firstPointX, element.firstPointY);
             break;
         case toSecond:
         default:
-            startX = element.firstPointX;
-            startY = element.firstPointY;
-            endX = element.secondPointX;
-            endY = element.secondPointY;
+            start = this.XY(element.firstPointX, element.firstPointY);
+            end = this.XY(element.secondPointX, element.secondPointY);
             break;
         }
         Element node;
         switch (element.type) {
         case WEDGED:
-            node = solidWedge(element, startX, startY, endX, endY);
+            node = solidWedge(element, start, end);
             break;
         case DASHED:
-            node = dashedWedge(element, startX, startY, endX, endY);
+            node = dashedWedge(element, start, end);
             break;
         case INDIFF:
         default:
-            node = wavyBond(element, startX, startY, endX, endY);
+            node = wavyBond(element, start, end);
             break;
         }
         // styling
@@ -209,14 +205,11 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
 
 
-    private Element wavyBond(WedgeLineElement element, Double startX, Double startY,
-                             Double endX, Double endY) {
+    private Element wavyBond(WedgeLineElement element, Point2d start, Point2d end) {
         Double width = 5.;
         Double interval = 5.;
-        Point2d start = this.XY(startX, startY);
-        Point2d end = this.XY(endX, endY);
-        Element path = this.document.createElementNS(SVG_NS, "path");
 
+        // Unit vector
         Double dx = end.x - start.x;
         Double dy = end.y - start.y;
         Double dist = Math.sqrt(dx * dx + dy * dy);
@@ -225,8 +218,10 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
         Integer counter = (int)Math.floor(dist / interval);
         Double curveLength = dist / counter;
-        String pen = "M" + Double.toString(start.x) + "," + Double.toString(start.y);
         Integer signum = 1;
+
+        Element path = this.document.createElementNS(SVG_NS, "path");
+        String pen = "M" + Double.toString(start.x) + "," + Double.toString(start.y);
         for (Integer i = 1; i <= counter ; i ++) {
             pen += String.format(" q %f,%f %f,%f",
                                  dx * (curveLength/2) + signum * dy * width,
@@ -242,12 +237,8 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
     
 
-    private Element dashedWedge(WedgeLineElement element, Double startX, Double startY,
-                                Double endX, Double endY) {
-        Point2d startPoint = this.XY(startX, startY);
-        Point2d endPoint = this.XY(endX, endY);
+    private Element dashedWedge(WedgeLineElement element, Point2d startPoint, Point2d endPoint) {
         Double N = 10.;
-        // Unit vector
         Double interval = 4.;
 
         // Unit vector
@@ -272,12 +263,14 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         Point2d wedgeLeft = new Point2d(endPoint.x + (N/2)*dy, endPoint.y - (N/2)*dx);
         Point2d wedgeRight = new Point2d(endPoint.x - (N/2)*dy, endPoint.y + (N/2)*dx);
 
+        // Unit vector
         Double ldx = wedgeLeft.x - startPoint.x;
         Double ldy = wedgeLeft.y - startPoint.y;
         Double ldist = Math.sqrt(ldx * ldx + ldy * ldy);
         ldx /= ldist;
         ldy /= ldist;
 
+        // Unit vector
         Double rdx = wedgeRight.x - startPoint.x;
         Double rdy = wedgeRight.y - startPoint.y;
         Double rdist = Math.sqrt(rdx * rdx + rdy * rdy);
@@ -314,11 +307,9 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
     
 
-    private Element solidWedge(WedgeLineElement element, Double startX, Double startY,
-                              Double endX, Double endY) {
-        Point2d startPoint = this.XY(startX, startY);
-        Point2d endPoint = this.XY(endX, endY);
+    private Element solidWedge(WedgeLineElement element, Point2d startPoint, Point2d endPoint) {
         Double N = 10.;
+
         // Unit vector
         Double dx = endPoint.x - startPoint.x;
         Double dy = endPoint.y - startPoint.y;
