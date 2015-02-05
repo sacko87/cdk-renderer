@@ -318,29 +318,30 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     private Element solidWedge(WedgeLineElement element, Double startX, Double startY,
                               Double endX, Double endY) {
-        Double N = .2;
+        Point2d startPoint = this.XY(startX, startY);
+        Point2d endPoint = this.XY(endX, endY);
+        Double N = 10.;
         // Unit vector
-        Double dx = endX - startX;
-        Double dy = endY - startY;
+        Double dx = endPoint.x - startPoint.x;
+        Double dy = endPoint.y - startPoint.y;
         Double dist = Math.sqrt(dx * dx + dy * dy);
         dx /= dist;
         dy /= dist;
         // Do we need to scale the line?
         if (element.getRelatedChemicalObject() != null) {
             for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
-                Point2d point = atom.getPoint2d();
-                if (point.x == endX && point.y == endY) {
+                Point2d point = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
+                if (point.x == endPoint.x && point.y == endPoint.y) {
                     Double scale = atom.getSymbol().equals("C") ? 1 : .75;
-                    endX = startX + (dist * scale) * dx;
-                    endY = startY + (dist * scale) * dy;
+                    endPoint.x = startPoint.x + (dist * scale) * dx;
+                    endPoint.y = startPoint.y + (dist * scale) * dy;
                     break;
                 }
             }
         }
         // transform the points and set the attributes
-        Point2d startPoint = this.XY(startX, startY);
-        Point2d wedgeLeft = this.XY(endX + (N/2)*dy, endY - (N/2)*dx);
-        Point2d wedgeRight = this.XY(endX - (N/2)*dy, endY + (N/2)*dx);
+        Point2d wedgeLeft = new Point2d(endPoint.x + (N/2)*dy, endPoint.y - (N/2)*dx);
+        Point2d wedgeRight = new Point2d(endPoint.x - (N/2)*dy, endPoint.y + (N/2)*dx);
         Element wedge = this.document.createElementNS(SVG_NS, "polygon");
 
         wedge.setAttribute("points", String.format("%f,%f %f,%f %f,%f",
