@@ -330,7 +330,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
             if(element.hydrogenCount > 1) {
                 // create some space
                 Element n = this.document.createElementNS(SVG_NS, "tspan");
-                n.setAttribute("baseline-shift", "sub");
+                n.setAttribute("baseline-shift", "-20%");
                 // add the count to it
                 n.appendChild(this.document.createTextNode(Integer.toString(element.hydrogenCount)));
                 Hx.appendChild(n);
