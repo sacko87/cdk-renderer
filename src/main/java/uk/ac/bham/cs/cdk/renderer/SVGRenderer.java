@@ -169,26 +169,89 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
 
     protected Node render(WedgeLineElement element) {
-        double startPointX, startPointY, endPointX, endPointY;
-        double N = .2;
+        double startX, startY, endX, endY;
         switch (element.direction) {
         case toFirst:
-            startPointX = element.secondPointX;
-            startPointY = element.secondPointY;
-            endPointX = element.firstPointX;
-            endPointY = element.firstPointY;
+            startX = element.secondPointX;
+            startY = element.secondPointY;
+            endX = element.firstPointX;
+            endY = element.firstPointY;
             break;
         case toSecond:
         default:
-            startPointX = element.firstPointX;
-            startPointY = element.firstPointY;
-            endPointX = element.secondPointX;
-            endPointY = element.secondPointY;
+            startX = element.firstPointX;
+            startY = element.firstPointY;
+            endX = element.secondPointX;
+            endY = element.secondPointY;
             break;
         }
+        Element node;
+        switch (element.type) {
+        case WEDGED:
+            // node = solidWedge(element, startX, startY, endX, endY);
+            // break;
+        case DASHED:
+            // node = dashedWedge(element, startX, startY, endX, endY);
+            // break;
+        case INDIFF:
+        default:
+            node = wavyBond(element, startX, startY, endX, endY);
+            break;
+        }
+        // styling
+        node.setAttribute("class", "bond");
+        // if attached to IChemObject
+        this.setId(node, element);
+
+        return node;
+    }
+
+
+    private Element wavyBond(WedgeLineElement element, double startX, double startY,
+                             double endX, double endY) {
+        Double width = 5.;
+        Double interval = 5.;
+        Point2d start = this.XY(startX, startY);
+        Point2d end = this.XY(endX, endY);
+        Element path = this.document.createElementNS(SVG_NS, "path");
+
+        Double dx = end.x - start.x;
+        Double dy = end.y - start.y;
+        Double dist = Math.sqrt(dx * dx + dy * dy);
+        dx /= dist;
+        dy /= dist;
+
+        Integer counter = (int)Math.floor(dist / interval);
+        Double curveLength = dist / counter;
+        String pen = "M" + Double.toString(start.x) + "," + Double.toString(start.y);
+        Integer signum = 1;
+        for (Integer i = 1; i <= counter ; i ++) {
+            pen += String.format(" q %f,%f %f,%f",
+                                 dx * (curveLength/2) + signum * dy * width,
+                                 dy * (curveLength/2) - signum * dx * width,
+                                 dx * curveLength, dy * curveLength);
+            signum *= -1;
+        }
+        path.setAttribute("d", pen);
+        setStroke(path);
+        setColor(Color.WHITE);
+        setFill(path);
+        return path;
+    }
+    
+
+    private Element dashedWedge(WedgeLineElement element, double startX, double startY,
+                                double endX, double endY) {
+        return solidWedge(element, startX, startY, endX, endY);
+    }
+    
+
+    private Element solidWedge(WedgeLineElement element, double startX, double startY,
+                              double endX, double endY) {
+        double N = .2;
         // Unit vector
-        double dx = endPointX - startPointX;
-        double dy = endPointY - startPointY;
+        double dx = endX - startX;
+        double dy = endY - startY;
         double dist = Math.sqrt(dx * dx + dy * dy);
         dx /= dist;
         dy /= dist;
@@ -196,43 +259,30 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         if (element.getRelatedChemicalObject() != null) {
             for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
                 Point2d point = atom.getPoint2d();
-                if (point.x == endPointX && point.y == endPointY) {
-                    System.out.println(atom.getSymbol());
+                if (point.x == endX && point.y == endY) {
                     double scale = atom.getSymbol().equals("C") ? 1 : .75;
-                    System.out.println("Scaling...");
-                    endPointX = startPointX + (dist * scale) * dx;
-                    endPointY = startPointY + (dist * scale) * dy;
+                    endX = startX + (dist * scale) * dx;
+                    endY = startY + (dist * scale) * dy;
                     break;
                 }
             }
         }
-
-        System.out.println(element.direction);
-        System.out.println(element.type);
-
         // transform the points and set the attributes
-        Point2d startPoint = this.XY(startPointX, startPointY);
-        Point2d wedgeLeft = this.XY(endPointX + (N/2)*dy, endPointY - (N/2)*dx);
-        Point2d wedgeRight = this.XY(endPointX - (N/2)*dy, endPointY + (N/2)*dx);
+        Point2d startPoint = this.XY(startX, startY);
+        Point2d wedgeLeft = this.XY(endX + (N/2)*dy, endY - (N/2)*dx);
+        Point2d wedgeRight = this.XY(endX - (N/2)*dy, endY + (N/2)*dx);
         Element wedge = this.document.createElementNS(SVG_NS, "polygon");
 
-        System.out.println(startPoint.x);
         wedge.setAttribute("points", String.format("%f,%f %f,%f %f,%f",
                                                    startPoint.x, startPoint.y,
                                                    wedgeLeft.x, wedgeLeft.y,
                                                    wedgeRight.x, wedgeRight.y));
-        wedge.setAttribute("style", "file:black");
-
-        // styling
+        this.setColor(Color.BLACK);
+        this.setFill(wedge);
         this.setStroke(wedge);
-        wedge.setAttribute("class", "bond");
-
-        // if attached to IChemObject
-        this.setId(wedge, element);
-
         return wedge;
     }
-
+    
 
     @Override
     protected Node render(AtomSymbolElement element) {
