@@ -38,6 +38,7 @@ import org.openscience.cdk.interfaces.IAtom;
 /**
  *
  * @author John T. Saxon
+ * @author Volker Sorge
  */
 public class SVGRenderer extends AbstractRenderer<Node> {
     /**
@@ -242,36 +243,34 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     private Element dashedWedge(WedgeLineElement element, Double startX, Double startY,
                                 Double endX, Double endY) {
-        Double N = .2;
+        Point2d startPoint = this.XY(startX, startY);
+        Point2d endPoint = this.XY(endX, endY);
+        Double N = 10.;
         // Unit vector
         Double interval = 4.;
 
-        Double dx = endX - startX;
-        Double dy = endY - startY;
+        // Unit vector
+        Double dx = endPoint.x - startPoint.x;
+        Double dy = endPoint.y - startPoint.y;
         Double dist = Math.sqrt(dx * dx + dy * dy);
         dx /= dist;
         dy /= dist;
         // Do we need to scale the line?
         if (element.getRelatedChemicalObject() != null) {
             for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
-                Point2d point = atom.getPoint2d();
-                if (point.x == endX && point.y == endY) {
+                Point2d point = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
+                if (point.x == endPoint.x && point.y == endPoint.y) {
                     Double scale = atom.getSymbol().equals("C") ? 1 : .75;
-                    endX = startX + (dist * scale) * dx;
-                    endY = startY + (dist * scale) * dy;
+                    endPoint.x = startPoint.x + (dist * scale) * dx;
+                    endPoint.y = startPoint.y + (dist * scale) * dy;
                     break;
                 }
             }
         }
         // transform the points and set the attributes
-        Point2d startPoint = this.XY(startX, startY);
-        Point2d wedgeLeft = this.XY(endX + (N/2)*dy, endY - (N/2)*dx);
-        Point2d wedgeRight = this.XY(endX - (N/2)*dy, endY + (N/2)*dx);
+        Point2d wedgeLeft = new Point2d(endPoint.x + (N/2)*dy, endPoint.y - (N/2)*dx);
+        Point2d wedgeRight = new Point2d(endPoint.x - (N/2)*dy, endPoint.y + (N/2)*dx);
 
-        System.out.println(startPoint);
-        System.out.println(wedgeLeft);
-        System.out.println(wedgeRight);
-        
         Double ldx = wedgeLeft.x - startPoint.x;
         Double ldy = wedgeLeft.y - startPoint.y;
         Double ldist = Math.sqrt(ldx * ldx + ldy * ldy);
@@ -288,7 +287,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         this.setColor(Color.BLACK);
         Integer counter = (int)Math.floor(ldist / interval);
         Double dashSep = ldist / counter;
-        System.out.println(counter + " " + dashSep + " " + ldx);
         Element wedge = this.document.createElementNS(SVG_NS, "g");
         for (Integer i = 0; i <= counter ; i ++) {
             Element dash = this.document.createElementNS(SVG_NS, "line");
