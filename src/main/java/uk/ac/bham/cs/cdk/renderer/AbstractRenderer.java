@@ -27,72 +27,73 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.Scale;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.ZoomFactor;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.elements.WedgeLineElement;
 
 /**
  *
- * 
+ *
  * @author sacko
  * @param <T>
  */
 public abstract class AbstractRenderer<T> {
     /**
-     * 
+     *
      */
     protected final double DEFAULT_SCALE = 30;
-    
+
     /**
-     * 
+     *
      */
     protected final double DEFAULT_XPAD = 2;
-    
+
     /**
-     * 
+     *
      */
     protected final double DEFAULT_YPAD = 2;
-        
+
     /**
-     * 
+     *
      */
     protected final Font DEFAULT_FONT = new Font("serif", Font.PLAIN, 15);
 
     /**
-     * 
+     *
      */
     private Color color;
 
     /**
-     * 
+     *
      */
     private BasicStroke stroke;
-    
+
     /**
-     * 
+     *
      */
     protected AffineTransform transform;
-    
+
     /**
-     * 
+     *
      */
     private final RendererModel model;
-    
+
     /**
-     * 
+     *
      */
     private Point2d modelCentre = new Point2d(0, 0);
 
     /**
-     * 
+     *
      */
     private Point2d drawingCentre = new Point2d(100, 100);
-    
+
     /**
-     * 
+     *
      */
     private final List<IGenerator<IAtomContainer>> generators;
 
     /**
-     * 
-     * @param model 
+     *
+     * @param model
      */
     protected AbstractRenderer(RendererModel model, List<IGenerator<IAtomContainer>> generators) {
         this.model = model;
@@ -100,54 +101,54 @@ public abstract class AbstractRenderer<T> {
         for(IGenerator<IAtomContainer> generator: this.generators) {
             this.model.registerParameters(generator);
         }
-        
+
         this.updateTransformer();
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public Color getColor() {
         return color;
     }
 
     /**
-     * 
-     * @param color 
+     *
+     * @param color
      */
     public void setColor(Color color) {
         this.color = color;
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public Point2d getModelCentre() {
         return this.modelCentre;
     }
-    
+
     /**
-     * 
-     * @param modelCentre 
+     *
+     * @param modelCentre
      */
     public void setModelCentre(Point2d modelCentre) {
         this.modelCentre = modelCentre;
         this.updateTransformer();
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public Point2d getDrawingCentre() {
         return this.drawingCentre;
     }
-    
+
     /**
-     * 
-     * @param drawingCentre 
+     *
+     * @param drawingCentre
      */
     public void setDrawingCentre(Point2d drawingCentre) {
         this.drawingCentre = drawingCentre;
@@ -155,16 +156,16 @@ public abstract class AbstractRenderer<T> {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public final Stroke getStroke() {
         return this.stroke;
     }
 
     /**
-     * 
-     * @param stroke 
+     *
+     * @param stroke
      */
     public final void setStroke(Stroke stroke) {
         if(stroke instanceof BasicStroke) {
@@ -173,80 +174,80 @@ public abstract class AbstractRenderer<T> {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public final Double getScale() {
        return this.getModel().getParameter(Scale.class).getValue();
     }
-    
+
     /**
-     * 
-     * @param atomContainer 
+     *
+     * @param atomContainer
      */
     public final void setScale(IAtomContainer atomContainer) {
         this.getModel().getParameter(Scale.class).setValue(this.calculateScaleForBondLength(GeometryTools.getBondLengthAverage(atomContainer)));
         this.updateTransformer();
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public final Double getZoom() {
        return this.getModel().getParameter(ZoomFactor.class).getValue();
     }
-    
+
     /**
-     * 
-     * @param value 
+     *
+     * @param value
      */
     public final void setZoom(Double value) {
         this.getModel().getParameter(ZoomFactor.class).setValue(value);
         this.updateTransformer();
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public RendererModel getModel() {
         return this.model;
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public List<IGenerator<IAtomContainer>> getGenerators() {
         return this.generators;
     }
-    
+
     /**
-     * 
+     *
      * @param x
      * @param y
-     * @return 
+     * @return
      */
     protected Point2d XY(Double x, Double y) {
         double[] i = new double[] {
             x, y
         };
-        
+
         this.transform.transform(i, 0, i, 0, 1);
-        
+
         return new Point2d(i);
     }
-    
+
     /**
-     * 
+     *
      * @param element
-     * @return 
+     * @return
      */
     protected abstract Point2d WH(T element);
-    
+
     /**
-     * 
+     *
      */
     protected final void updateTransformer() {
         this.transform = new AffineTransform();
@@ -256,7 +257,7 @@ public abstract class AbstractRenderer<T> {
         this.transform.scale(this.getZoom(), this.getZoom());
         this.transform.translate(-this.modelCentre.x, -this.modelCentre.y);
     }
-    
+
     /**
      * Given a bond length for a model, calculate the scale that will transform
      * this length to the on screen bond length in RendererModel.
@@ -272,52 +273,54 @@ public abstract class AbstractRenderer<T> {
                     BasicSceneGenerator.BondLength.class).getValue() / bondLenght;
         }
     }
-    
+
     /**
-     * 
+     *
      * @param atomContainer
      * @param width
      * @param height
-     * @return 
+     * @return
      */
     public T render(IAtomContainer atomContainer, Double width, Double height) {
         this.setScale(atomContainer);
         this.setDrawingCentre(new Point2d(width / 2, height / 2));
-        
+
         ElementGroup diagram = new ElementGroup();
         for(IGenerator<IAtomContainer> generator: this.getGenerators()) {
             diagram.add(generator.generate(atomContainer, this.getModel()));
         }
-        
+
         return this.render(diagram, atomContainer);
     }
-    
+
     /**
-     * 
+     *
      * @param element
      * @param atomContainer
-     * @return 
+     * @return
      */
     protected T render(IRenderingElement element, IAtomContainer atomContainer) {
         Rectangle2D boundBox = BoundsCalculator.calculateBounds(atomContainer);
         this.setModelCentre(new Point2d(boundBox.getCenterX(), boundBox.getCenterY()));
-        
+
         return this.render(element);
     }
 
     /**
-     * 
-     * @param element 
-     * @return  
+     *
+     * @param element
+     * @return
      */
     protected T render(IRenderingElement element) {
         // save current colours/stroke
         Color  pColor = this.getColor();
         Stroke pStroke = this.getStroke();
-        
+
         T result;
         // generate the result
-        if(element instanceof LineElement) {
+        if(element instanceof WedgeLineElement) {
+            result = this.render((WedgeLineElement) element);
+        } else if(element instanceof LineElement) {
             result = this.render((LineElement) element);
         } else if(element instanceof ElementGroup) {
             result = this.render((ElementGroup) element);
@@ -328,44 +331,53 @@ public abstract class AbstractRenderer<T> {
                     "The rendering of " + element.getClass().getCanonicalName()
                             + " is not supported.");
         }
-        
+
         // restore the colours/strokes
         this.setColor(pColor);
         this.setStroke(pStroke);
-        
+
         return result;
     }
-    
+
+
     /**
-     * 
-     * @param element 
-     * @return  
+     *
+     * @param element
+     * @return
+     */
+    protected abstract T render(WedgeLineElement element);
+
+
+    /**
+     *
+     * @param element
+     * @return
      */
     protected abstract T render(LineElement element);
 
     /**
-     * 
-     * @param element 
-     * @return  
+     *
+     * @param element
+     * @return
      */
     protected abstract T render(ElementGroup element);
 
     /**
-     * 
-     * @param element 
-     * @return  
+     *
+     * @param element
+     * @return
      */
     protected abstract T render(AtomSymbolElement element);
 
     /**
-     * 
-     * @param element 
+     *
+     * @param element
      */
     protected abstract void setFill(T element);
 
     /**
-     * 
-     * @param element 
+     *
+     * @param element
      */
     protected abstract void setStroke(T element);
 }
