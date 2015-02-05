@@ -11,10 +11,23 @@
 //
 package uk.ac.bham.cs.cdk.renderer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
@@ -24,22 +37,17 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import nu.xom.ParsingException;
 import org.apache.commons.io.FilenameUtils;
-import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.io.CMLReader;
+import org.openscience.cdk.io.CMLWriter;
+import org.openscience.cdk.io.ISimpleChemObjectReader;
+import org.openscience.cdk.io.ReaderFactory;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 import org.w3c.dom.Document;
-import java.nio.file.Path;
-import java.util.EnumSet;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.FileVisitResult;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.io.IOException;
 
 
 /**
@@ -93,14 +101,17 @@ public class FileHandler {
     public static IAtomContainer fromFile(Path path) {
         IAtomContainer mole = null;
         try {
-            // open the file
-            InputStream input = new FileInputStream(path.toFile());
-            // parse and read in the CML file
-            IChemFile chemFile = (IChemFile) (new CMLReader(input)).read(new ChemFile());
-            // set the IAtomContainer molecule
-            mole = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);
-        } catch (FileNotFoundException | CDKException | NullPointerException ex) {
-            // lets assume this didn't work
+            InputStream file = new BufferedInputStream(new FileInputStream(path.toFile()));
+            ISimpleChemObjectReader reader = new ReaderFactory().createReader(file);
+            IChemFile cFile = null;
+            cFile = reader.read(SilentChemObjectBuilder.getInstance().
+                                newInstance(IChemFile.class));
+            reader.close();
+            mole = ChemFileManipulator.getAllAtomContainers(cFile).get(0);
+            if(!path.toString().toLowerCase().endsWith(".cml")) {
+                FileHandler.buildCML(path, mole);
+            }
+        } catch (IOException | CDKException | NullPointerException | ParsingException ex) {
             Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -114,18 +125,13 @@ public class FileHandler {
 
 
     public static void translateFile(Path file, SVGRenderer renderer) {
-        if(file.toString().toLowerCase().endsWith(".cml")) {
-            // read in the molecule from the CML
-            IAtomContainer mole = FileHandler.fromFile(file);
-            if (mole != null) {
-                Document doc = null;
-                // render the molecule
-                doc = (Document)renderer.render(mole,
-                                                FileHandler.DEFAULT_WIDTH,
-                                                FileHandler.DEFAULT_HEIGHT);
-                // write it to // TODO: he file
-                FileHandler.toFile(doc, file);
-            }
+        IAtomContainer mole = FileHandler.fromFile(file);
+        if (mole != null) {
+            Document doc = null;
+            doc = (Document)renderer.render(mole,
+                                            FileHandler.DEFAULT_WIDTH,
+                                            FileHandler.DEFAULT_HEIGHT);
+            FileHandler.toFile(doc, file);
         }
     }
 
@@ -150,5 +156,32 @@ public class FileHandler {
             Logger.getLogger("Incorrect file " + pathName).log(Level.SEVERE, null, e);
         }
         
-    } 
+    }
+
+
+    /**
+     * Build the CML XOM element. Makes sure that we have object ids if the
+     * input file is not a CML file. Writes the corresponding CML file.
+     * 
+     * @throws IOException
+     *             Problems with PrintWriter
+     * @throws CDKException
+     *             Problems with CMLWriter
+     * @throws ParsingException
+     *             Problems with building CML XOM.
+     */
+    private static void buildCML(Path path, IAtomContainer mol)
+        throws IOException, CDKException, ParsingException {
+        String filename = path.getFileName().toString();
+        OutputStream outFile = new BufferedOutputStream
+            (new FileOutputStream
+             (FilenameUtils.removeExtension(path.toString()) + ".cml"));
+        PrintWriter output = new PrintWriter(outFile);
+        CMLWriter cmlwriter = new CMLWriter(output);
+        cmlwriter.write(mol);
+        cmlwriter.close();
+        output.flush();
+        output.close();
+    }
+
 }

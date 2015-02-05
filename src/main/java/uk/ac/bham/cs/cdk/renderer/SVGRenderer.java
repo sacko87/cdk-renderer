@@ -171,6 +171,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     protected Node render(WedgeLineElement element) {
         Double startX, startY, endX, endY;
+        System.out.println(element.type);
         switch (element.direction) {
         case toFirst:
             startX = element.secondPointX;
@@ -297,16 +298,15 @@ public class SVGRenderer extends AbstractRenderer<Node> {
             dash.setAttribute("y1", Double.toString(startPoint.y + ldy * i * dashSep));
 
             // transform the points and set the attributes
-        dash.setAttribute("x2", Double.toString(startPoint.x + rdx * i * dashSep));
-        dash.setAttribute("y2", Double.toString(startPoint.y + rdy * i * dashSep));
+            dash.setAttribute("x2", Double.toString(startPoint.x + rdx * i * dashSep));
+            dash.setAttribute("y2", Double.toString(startPoint.y + rdy * i * dashSep));
 
         // styling
-        this.setStroke(dash);
-        dash.setAttribute("class", "dash");
+            this.setStroke(dash);
+            dash.setAttribute("class", "dash");
 
-        this.setStroke(dash);
-        wedge.appendChild(dash);
-
+            this.setStroke(dash);
+            wedge.appendChild(dash);
         }
 
         wedge.setAttribute("class", "bond");
