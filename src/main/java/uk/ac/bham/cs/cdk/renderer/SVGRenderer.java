@@ -52,6 +52,13 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     public static final String SVG_NS = "http://www.w3.org/2000/svg";
 
     /**
+     * Some constant parameters for the SVG elements.
+     */
+    protected Double base = 10.;      // Baseline of wedges.
+    protected Double interval = 4.5;  // Interval for dashed and wavy bonds.
+    protected Double wave = 5.;       // Extension of waves.
+    
+    /**
      *
      * @param model
      * @param generators
@@ -143,35 +150,20 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         return doc;
     }
 
+
     @Override
     protected Node render(LineElement element) {
         Point2d point;
-        // create the line needed
-        Element line = this.document.createElementNS(SVG_NS, "line");
-
-        // transform the points and set the attributes
-        point = this.XY(element.firstPointX, element.firstPointY);
-        line.setAttribute("x1", Double.toString(point.x));
-        line.setAttribute("y1", Double.toString(point.y));
-
-        // transform the points and set the attributes
-        point = this.XY(element.secondPointX, element.secondPointY);
-        line.setAttribute("x2", Double.toString(point.x));
-        line.setAttribute("y2", Double.toString(point.y));
-
-        // styling
-        this.setStroke(line);
+        Element line = line(this.XY(element.firstPointX, element.firstPointY),
+                            this.XY(element.secondPointX, element.secondPointY));
         line.setAttribute("class", "bond");
-
-        // if attached to IChemObject
         this.setId(line, element);
-
         return line;
     }
 
+
     protected Node render(WedgeLineElement element) {
         Point2d start, end;
-        System.out.println(element.type);
         switch (element.direction) {
         case toFirst:
             start = this.XY(element.secondPointX, element.secondPointY);
@@ -205,28 +197,65 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
 
 
+    /**
+     * Simple Unit Vector class.
+     */
+    private class UnitVector {
+        protected Double dx;
+        protected Double dy;
+        protected Double dist;
+
+        /**
+         *
+         * @param start Start point of vector.
+         * @param end End point of vector.
+         *
+         * @return
+         */
+        public UnitVector(Point2d start, Point2d end) {
+            dx = end.x - start.x;
+            dy = end.y - start.y;
+            dist = Math.sqrt(dx * dx + dy * dy);
+            dx /= dist;
+            dy /= dist;
+        }
+    }
+
+
+    /**
+     * Assembles and SVG line element from a start and end point.
+     *
+     * @param start
+     * @param end
+     *
+     * @return
+     */
+    private Element line(Point2d start, Point2d end) {
+        Element line = this.document.createElementNS(SVG_NS, "line");
+        line.setAttribute("x1", Double.toString(start.x));
+        line.setAttribute("y1", Double.toString(start.y));
+        line.setAttribute("x2", Double.toString(end.x));
+        line.setAttribute("y2", Double.toString(end.y));
+        this.setStroke(line);
+        return line;
+    }
+
+
     private Element wavyBond(WedgeLineElement element, Point2d start, Point2d end) {
-        Double width = 5.;
-        Double interval = 5.;
+        UnitVector unit = new UnitVector(start, end);
 
-        // Unit vector
-        Double dx = end.x - start.x;
-        Double dy = end.y - start.y;
-        Double dist = Math.sqrt(dx * dx + dy * dy);
-        dx /= dist;
-        dy /= dist;
-
-        Integer counter = (int)Math.floor(dist / interval);
-        Double curveLength = dist / counter;
+        Integer counter = (int)Math.floor(unit.dist / this.interval);
+        Double curveLength = unit.dist / counter;
         Integer signum = 1;
 
         Element path = this.document.createElementNS(SVG_NS, "path");
         String pen = "M" + Double.toString(start.x) + "," + Double.toString(start.y);
         for (Integer i = 1; i <= counter ; i ++) {
             pen += String.format(" q %f,%f %f,%f",
-                                 dx * (curveLength/2) + signum * dy * width,
-                                 dy * (curveLength/2) - signum * dx * width,
-                                 dx * curveLength, dy * curveLength);
+                                 unit.dx * (curveLength / 2) + signum * unit.dy * this.wave,
+                                 unit.dy * (curveLength / 2) - signum * unit.dx * this.wave,
+                                 unit.dx * curveLength,
+                                 unit.dy * curveLength);
             signum *= -1;
         }
         path.setAttribute("d", pen);
@@ -235,114 +264,96 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         setFill(path);
         return path;
     }
-    
 
-    private Element dashedWedge(WedgeLineElement element, Point2d startPoint, Point2d endPoint) {
-        Double N = 10.;
-        Double interval = 4.;
 
-        // Unit vector
-        Double dx = endPoint.x - startPoint.x;
-        Double dy = endPoint.y - startPoint.y;
-        Double dist = Math.sqrt(dx * dx + dy * dy);
-        dx /= dist;
-        dy /= dist;
-        // Do we need to scale the line?
-        if (element.getRelatedChemicalObject() != null) {
-            for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
-                Point2d point = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
-                if (point.x == endPoint.x && point.y == endPoint.y) {
-                    Double scale = atom.getSymbol().equals("C") ? 1 : .75;
-                    endPoint.x = startPoint.x + (dist * scale) * dx;
-                    endPoint.y = startPoint.y + (dist * scale) * dy;
-                    break;
+    /**
+     * Wedge outline.
+     */
+    private class Wedge {
+        protected Point2d tip;
+        protected Point2d left;
+        protected Point2d right;
+
+        /**
+         * Scales the distance of a wedge element depending on the end element being
+         * not a Carbon element.
+         *
+         * @param element
+         * @param start
+         * @param end
+         * @param unit
+         */
+        private void scaleDistance(WedgeLineElement element, Point2d start,
+                                   Point2d end, UnitVector unit) {
+            if (element.getRelatedChemicalObject() != null) {
+                for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
+                    Point2d point = SVGRenderer.this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
+                    if (point.x == end.x && point.y == end.y) {
+                        Double scale = atom.getSymbol().equals("C") ? 1 : .75;
+                        end.x = start.x + (unit.dist * scale) * unit.dx;
+                        end.y = start.y + (unit.dist * scale) * unit.dy;
+                        break;
+                    }
                 }
             }
         }
-        // transform the points and set the attributes
-        Point2d wedgeLeft = new Point2d(endPoint.x + (N/2)*dy, endPoint.y - (N/2)*dx);
-        Point2d wedgeRight = new Point2d(endPoint.x - (N/2)*dy, endPoint.y + (N/2)*dx);
-
-        // Unit vector
-        Double ldx = wedgeLeft.x - startPoint.x;
-        Double ldy = wedgeLeft.y - startPoint.y;
-        Double ldist = Math.sqrt(ldx * ldx + ldy * ldy);
-        ldx /= ldist;
-        ldy /= ldist;
-
-        // Unit vector
-        Double rdx = wedgeRight.x - startPoint.x;
-        Double rdy = wedgeRight.y - startPoint.y;
-        Double rdist = Math.sqrt(rdx * rdx + rdy * rdy);
-        rdx /= rdist;
-        rdy /= rdist;
 
 
+        /**
+         *
+         * @param start Start point of vector.
+         * @param end End point of vector.
+         *
+         * @return
+         */
+        public Wedge(WedgeLineElement element, Point2d start, Point2d end) {
+            this.tip = start;
+            UnitVector unit = new UnitVector(start, end);
+            scaleDistance(element, start, end, unit);
+            this.left = new Point2d(end.x + (SVGRenderer.this.base / 2) * unit.dy,
+                                    end.y - (SVGRenderer.this.base / 2) * unit.dx);
+            this.right = new Point2d(end.x - (SVGRenderer.this.base / 2) * unit.dy,
+                                     end.y + (SVGRenderer.this.base / 2) * unit.dx);
+        }
+    }
+
+
+    private Element dashedWedge(WedgeLineElement element, Point2d start, Point2d end) {
+        Wedge wedge = new Wedge(element, start, end);
+        UnitVector left = new UnitVector(wedge.tip, wedge.left);
+        UnitVector right = new UnitVector(wedge.tip, wedge.right);
+        Integer counter = (int)Math.floor(left.dist / this.interval);
+        Double dashSep = left.dist / counter;
+        Element bond = this.document.createElementNS(SVG_NS, "g");
         this.setColor(Color.BLACK);
-        Integer counter = (int)Math.floor(ldist / interval);
-        Double dashSep = ldist / counter;
-        Element wedge = this.document.createElementNS(SVG_NS, "g");
         for (Integer i = 0; i <= counter ; i ++) {
-            Element dash = this.document.createElementNS(SVG_NS, "line");
-
-
-            // transform the points and set the attributes
-            dash.setAttribute("x1", Double.toString(startPoint.x + ldx * i * dashSep));
-            dash.setAttribute("y1", Double.toString(startPoint.y + ldy * i * dashSep));
-
-            // transform the points and set the attributes
-            dash.setAttribute("x2", Double.toString(startPoint.x + rdx * i * dashSep));
-            dash.setAttribute("y2", Double.toString(startPoint.y + rdy * i * dashSep));
-
-        // styling
-            this.setStroke(dash);
+            Element dash = line(new Point2d(wedge.tip.x + left.dx * i * dashSep,
+                                            wedge.tip.y + left.dy * i * dashSep),
+                                new Point2d(wedge.tip.x + right.dx * i * dashSep,
+                                            wedge.tip.y + right.dy * i * dashSep));
             dash.setAttribute("class", "dash");
-
-            this.setStroke(dash);
-            wedge.appendChild(dash);
+            bond.appendChild(dash);
         }
 
-        wedge.setAttribute("class", "bond");
-        return wedge;
+        bond.setAttribute("class", "bond");
+        return bond;
     }
-    
 
-    private Element solidWedge(WedgeLineElement element, Point2d startPoint, Point2d endPoint) {
-        Double N = 10.;
 
-        // Unit vector
-        Double dx = endPoint.x - startPoint.x;
-        Double dy = endPoint.y - startPoint.y;
-        Double dist = Math.sqrt(dx * dx + dy * dy);
-        dx /= dist;
-        dy /= dist;
-        // Do we need to scale the line?
-        if (element.getRelatedChemicalObject() != null) {
-            for (IAtom atom : ((IBond)element.getRelatedChemicalObject()).atoms()) {
-                Point2d point = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
-                if (point.x == endPoint.x && point.y == endPoint.y) {
-                    Double scale = atom.getSymbol().equals("C") ? 1 : .75;
-                    endPoint.x = startPoint.x + (dist * scale) * dx;
-                    endPoint.y = startPoint.y + (dist * scale) * dy;
-                    break;
-                }
-            }
-        }
+    private Element solidWedge(WedgeLineElement element, Point2d start, Point2d end) {
+        Wedge wedge = new Wedge(element, start, end);
         // transform the points and set the attributes
-        Point2d wedgeLeft = new Point2d(endPoint.x + (N/2)*dy, endPoint.y - (N/2)*dx);
-        Point2d wedgeRight = new Point2d(endPoint.x - (N/2)*dy, endPoint.y + (N/2)*dx);
-        Element wedge = this.document.createElementNS(SVG_NS, "polygon");
-
-        wedge.setAttribute("points", String.format("%f,%f %f,%f %f,%f",
-                                                   startPoint.x, startPoint.y,
-                                                   wedgeLeft.x, wedgeLeft.y,
-                                                   wedgeRight.x, wedgeRight.y));
+        Element bond = this.document.createElementNS(SVG_NS, "polygon");
+        bond.setAttribute("points", String.format("%f,%f %f,%f %f,%f",
+                                                   start.x, start.y,
+                                                   wedge.left.x, wedge.left.y,
+                                                   wedge.right.x, wedge.right.y));
         this.setColor(Color.BLACK);
-        this.setFill(wedge);
-        this.setStroke(wedge);
-        return wedge;
+        this.setFill(bond);
+        this.setStroke(bond);
+        return bond;
     }
-    
+
 
     @Override
     protected Node render(AtomSymbolElement element) {
