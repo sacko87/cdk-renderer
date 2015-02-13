@@ -101,11 +101,10 @@ public abstract class AbstractRenderer<T> {
      */
     private final List<IGenerator<IAtomContainer>> generators;
 
-    protected static Double minX = Double.POSITIVE_INFINITY;
-    protected static Double minY = Double.POSITIVE_INFINITY;
-    protected static Double maxX = Double.NEGATIVE_INFINITY;
-    protected static Double maxY = Double.NEGATIVE_INFINITY;
-
+    private static Double minX = Double.POSITIVE_INFINITY;
+    private static Double minY = Double.POSITIVE_INFINITY;
+    private static Double maxX = Double.NEGATIVE_INFINITY;
+    private static Double maxY = Double.NEGATIVE_INFINITY;
 
 
     /**
@@ -398,12 +397,27 @@ public abstract class AbstractRenderer<T> {
      */
     protected abstract void setStroke(T element);
 
-    protected static final void updateMinMax(Double x, Double y) {
+    protected final void updateMinMax(Double x, Double y) {
+        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
         minX = Math.min(x, minX);
         minY = Math.min(y, minY);
         maxX = Math.max(x, maxX);
         maxY = Math.max(y, maxY);
         System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
-        
     }
+
+    protected final String getViewBox() {
+        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
+        return (minX - 20) + " " + (minY - 20) + " " +
+            (maxX + 20) + " " + (maxY + 20);
+    }
+
+    protected final String getWidth() {
+        return Double.toString(maxX - minX + 40.);
+    }
+
+    protected final String getHeight() {
+        return Double.toString(maxY - minY + 40.);
+    }
+
 }

@@ -137,14 +137,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         Document doc = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
         // set the height and width attributes
         
-        doc.getDocumentElement().setAttribute("viewBox", //(new Formatter).format
-                                              //("%f %f %f %f", minX - 20, minY - 20, maxX + 20, maxY + 20));
-                                              (minX - 20) + " " + (minY - 20) + " " +
-                                              (maxX + 20) + " " + (maxY + 20));
-        // Double.toString(DEFAULT_HEIGHT)
-        doc.getDocumentElement().setAttribute("width", Double.toString(maxX - minX + 40.));
-        doc.getDocumentElement().setAttribute("height", Double.toString(maxY - minY + 40.));
-
         // store this document for
         // use within this render
         this.document = doc;
@@ -154,6 +146,12 @@ public class SVGRenderer extends AbstractRenderer<Node> {
             // add the resultant model to the document
             doc.getDocumentElement().appendChild(result);
         }
+
+        doc.getDocumentElement().setAttribute("viewBox", //(new Formatter).format
+                                              //("%f %f %f %f", minX - 20, minY - 20, maxX + 20, maxY + 20));
+                                              getViewBox());
+        doc.getDocumentElement().setAttribute("width", getWidth());
+        doc.getDocumentElement().setAttribute("height", getHeight());
 
         return doc;
     }
