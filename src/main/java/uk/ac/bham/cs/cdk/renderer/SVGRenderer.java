@@ -130,18 +130,18 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
 
     @Override
-    public Node render(IAtomContainer atomContainer, Double width, Double height) {
+    public Node render(IAtomContainer atomContainer) {
         // create an SVG DOM document
         Document doc = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
         // set the height and width attributes
-        doc.getDocumentElement().setAttribute("width", Double.toString(width));
-        doc.getDocumentElement().setAttribute("height", Double.toString(height));
+        doc.getDocumentElement().setAttribute("width", Double.toString(DEFAULT_WIDTH));
+        doc.getDocumentElement().setAttribute("height", Double.toString(DEFAULT_HEIGHT));
 
         // store this document for
         // use within this render
         this.document = doc;
 
-        Node result = super.render(atomContainer, width, height);
+        Node result = super.render(atomContainer);
         if(result != null) {
             // add the resultant model to the document
             doc.getDocumentElement().appendChild(result);

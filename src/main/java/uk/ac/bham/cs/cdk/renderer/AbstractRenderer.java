@@ -54,6 +54,16 @@ public abstract class AbstractRenderer<T> {
     /**
      *
      */
+    protected static final double DEFAULT_WIDTH = 400.;
+
+    /**
+     *
+     */
+    protected static final double DEFAULT_HEIGHT = 400.;
+
+    /**
+     *
+     */
     protected final Font DEFAULT_FONT = new Font("serif", Font.PLAIN, 15);
 
     /**
@@ -281,10 +291,9 @@ public abstract class AbstractRenderer<T> {
      * @param height
      * @return
      */
-    public T render(IAtomContainer atomContainer, Double width, Double height) {
+    public T render(IAtomContainer atomContainer) {
         this.setScale(atomContainer);
-        this.setDrawingCentre(new Point2d(width / 2, height / 2));
-
+        this.setDrawingCentre(new Point2d(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2));
         ElementGroup diagram = new ElementGroup();
         for(IGenerator<IAtomContainer> generator: this.getGenerators()) {
             diagram.add(generator.generate(atomContainer, this.getModel()));

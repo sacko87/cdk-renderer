@@ -56,9 +56,6 @@ import org.w3c.dom.Document;
 
 public class FileHandler {
 
-    protected static final double DEFAULT_WIDTH = 400.;
-    protected static final double DEFAULT_HEIGHT = 400.;
-
     /**
      * 
      * @param document
@@ -125,9 +122,7 @@ public class FileHandler {
         IAtomContainer mole = FileHandler.fromFile(file);
         if (mole != null) {
             Document doc = null;
-            doc = (Document)renderer.render(mole,
-                                            FileHandler.DEFAULT_WIDTH,
-                                            FileHandler.DEFAULT_HEIGHT);
+            doc = (Document)renderer.render(mole);
             Path newFile = FileHandler.rewritePath(file, "svg");
             FileHandler.toFile(doc, newFile);
         }

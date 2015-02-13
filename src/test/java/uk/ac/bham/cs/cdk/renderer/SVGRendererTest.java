@@ -42,16 +42,6 @@ public class SVGRendererTest {
     /**
      * 
      */
-    protected static final Double DEFAULT_WIDTH = 200.0;
-    
-    /**
-     * 
-     */
-    protected static final Double DEFAULT_HEIGHT = 200.0;
-    
-    /**
-     * 
-     */
     public SVGRendererTest() {
         // create the render model (configuration)
         RendererModel rendererModel = new RendererModel();
@@ -93,7 +83,7 @@ public class SVGRendererTest {
         mole = sdg.getMolecule();
         if(mole != null) {
             // render the molecule
-            Document doc = (Document) this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
+            Document doc = (Document) this.renderer.render(mole);
             Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
 
             // write it to the file
@@ -123,7 +113,7 @@ public class SVGRendererTest {
                         Document doc = null;
                         try {
                         // render the molecule
-                            doc = (Document) SVGRendererTest.this.renderer.render(mole, SVGRendererTest.DEFAULT_WIDTH, SVGRendererTest.DEFAULT_HEIGHT);
+                            doc = (Document) SVGRendererTest.this.renderer.render(mole);
                         } catch(IllegalArgumentException e) {
                             // to show which file threw the exception
                             throw new IllegalArgumentException(file.toString(), e);
