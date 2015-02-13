@@ -66,10 +66,7 @@ public class FileHandler {
      * @return 
      */
     public static Boolean toFile(Document document, Path path) {
-        // where shall we save it?
-        String filename = path.getFileName().toString();
-        path = path.resolveSibling(FilenameUtils.removeExtension(filename) + ".svg");
-        
+        //
         // prepare the transformer
         DOMSource domSource = new DOMSource(document);
         StreamResult streamResult = new StreamResult(new File(path.toString()));
@@ -131,7 +128,8 @@ public class FileHandler {
             doc = (Document)renderer.render(mole,
                                             FileHandler.DEFAULT_WIDTH,
                                             FileHandler.DEFAULT_HEIGHT);
-            FileHandler.toFile(doc, file);
+            Path newFile = FileHandler.rewritePath(file, "svg");
+            FileHandler.toFile(doc, newFile);
         }
     }
 
@@ -158,6 +156,14 @@ public class FileHandler {
         
     }
 
+
+    private static Path rewritePath(Path path, String extension) {
+        String filename = path.getFileName().toString();
+        String newFile = FilenameUtils.removeExtension(filename) + "." + extension;
+        Path newPath = Cli.hasOption("output") ? Paths.get(Cli.getOptionValue("output"), newFile) : 
+            path.resolveSibling(newFile);
+        return newPath;
+    }
 
     /**
      * Build the CML XOM element. Makes sure that we have object ids if the

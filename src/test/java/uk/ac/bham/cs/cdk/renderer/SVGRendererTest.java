@@ -26,6 +26,7 @@ import org.openscience.cdk.templates.MoleculeFactory;
 import org.w3c.dom.Document;
 import uk.ac.bham.cs.cdk.renderer.generators.BasicAtomGenerator;
 import uk.ac.bham.cs.cdk.renderer.generators.BasicBondGenerator;
+import org.apache.commons.io.FilenameUtils;
 
 
 /**
@@ -96,7 +97,7 @@ public class SVGRendererTest {
             Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
 
             // write it to the file
-            Boolean b = FileHandler.toFile(doc, /* fake path */ Paths.get("cml/triazole.cml"));
+            Boolean b = FileHandler.toFile(doc, /* fake path */ Paths.get("cml/triazole.svg"));
             Assert.assertEquals(Boolean.TRUE, b);
         }
     }
@@ -130,7 +131,8 @@ public class SVGRendererTest {
                         Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
                         
                         // write it to the file
-                        Boolean b = FileHandler.toFile(doc, file);
+                        String svgFile = FilenameUtils.removeExtension(file.getFileName().toString()) + ".svg";
+                        Boolean b = FileHandler.toFile(doc, file.resolveSibling(svgFile));
                         Assert.assertEquals(Boolean.TRUE, b);
                     }
                 }
