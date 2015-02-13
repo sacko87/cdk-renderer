@@ -133,4 +133,15 @@ public class SVGRendererTest {
         });
     }
     
+    /**
+     * 
+     * @throws IOException 
+     */
+    @Test
+    public void testDirectory() throws IOException {
+        String[] dummy = {"-d", "cml"};
+        Cli.init(dummy);
+        FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
+    }
+    
 }

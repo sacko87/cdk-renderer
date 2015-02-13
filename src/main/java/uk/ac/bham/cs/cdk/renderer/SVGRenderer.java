@@ -34,6 +34,7 @@ import org.w3c.dom.svg.SVGRect;
 import org.openscience.cdk.renderer.elements.WedgeLineElement;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IAtom;
+import java.util.Formatter;
 
 /**
  *
@@ -90,6 +91,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         // get the boundary of the result
         SVGRect bbox = ((SVGLocatable) n).getBBox();
 
+        System.out.println(bbox.getX() + " " + bbox.getY());
         // return the points (x:width, y:height)
         return new Point2d(bbox.getWidth(), bbox.getHeight());
     }
@@ -134,8 +136,14 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         // create an SVG DOM document
         Document doc = SVGDOMImplementation.getDOMImplementation().createDocument(SVG_NS, "svg", null);
         // set the height and width attributes
-        doc.getDocumentElement().setAttribute("width", Double.toString(DEFAULT_WIDTH));
-        doc.getDocumentElement().setAttribute("height", Double.toString(DEFAULT_HEIGHT));
+        
+        doc.getDocumentElement().setAttribute("viewBox", //(new Formatter).format
+                                              //("%f %f %f %f", minX - 20, minY - 20, maxX + 20, maxY + 20));
+                                              (minX - 20) + " " + (minY - 20) + " " +
+                                              (maxX + 20) + " " + (maxY + 20));
+        // Double.toString(DEFAULT_HEIGHT)
+        doc.getDocumentElement().setAttribute("width", Double.toString(maxX - minX + 40.));
+        doc.getDocumentElement().setAttribute("height", Double.toString(maxY - minY + 40.));
 
         // store this document for
         // use within this render

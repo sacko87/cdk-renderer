@@ -54,12 +54,12 @@ public abstract class AbstractRenderer<T> {
     /**
      *
      */
-    protected static final double DEFAULT_WIDTH = 400.;
+    protected static final double DEFAULT_WIDTH = 100.;
 
     /**
      *
      */
-    protected static final double DEFAULT_HEIGHT = 400.;
+    protected static final double DEFAULT_HEIGHT = 100.;
 
     /**
      *
@@ -100,6 +100,13 @@ public abstract class AbstractRenderer<T> {
      *
      */
     private final List<IGenerator<IAtomContainer>> generators;
+
+    protected static Double minX = Double.POSITIVE_INFINITY;
+    protected static Double minY = Double.POSITIVE_INFINITY;
+    protected static Double maxX = Double.NEGATIVE_INFINITY;
+    protected static Double maxY = Double.NEGATIVE_INFINITY;
+
+
 
     /**
      *
@@ -246,6 +253,7 @@ public abstract class AbstractRenderer<T> {
 
         this.transform.transform(i, 0, i, 0, 1);
 
+        updateMinMax(i[0], i[1]);
         return new Point2d(i);
     }
 
@@ -389,4 +397,13 @@ public abstract class AbstractRenderer<T> {
      * @param element
      */
     protected abstract void setStroke(T element);
+
+    protected static final void updateMinMax(Double x, Double y) {
+        minX = Math.min(x, minX);
+        minY = Math.min(y, minY);
+        maxX = Math.max(x, maxX);
+        maxY = Math.max(y, maxY);
+        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
+        
+    }
 }
