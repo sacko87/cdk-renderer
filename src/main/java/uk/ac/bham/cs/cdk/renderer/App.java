@@ -31,6 +31,9 @@ public class App {
         // add my options
         renderer.getModel().set(BasicAtomGenerator.ShowExplicitHydrogens.class, true);
         renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
+        if (Cli.hasOption("dir")) {
+            FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
+        }
 	for (String file : Cli.getFiles()) {
 	    FileHandler.translateFile(file, renderer);
         }
