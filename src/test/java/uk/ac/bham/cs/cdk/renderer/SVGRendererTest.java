@@ -35,12 +35,12 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class SVGRendererTest {
     /**
-     * 
+     *
      */
     protected SVGRenderer renderer;
-    
+
     /**
-     * 
+     *
      */
     public SVGRendererTest() {
         // create the render model (configuration)
@@ -52,22 +52,22 @@ public class SVGRendererTest {
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
         generators.add(new BasicAtomGenerator());
-        
+
         // setup the renderer
         this.renderer = new SVGRenderer(rendererModel, generators);
         // add my options
         this.renderer.getModel().set(BasicAtomGenerator.ShowExplicitHydrogens.class, true);
         this.renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
     }
-    
+
     /**
-     * 
+     *
      */
     @Test
     public void testFactory() {
         // create a factory molecule
         IAtomContainer mole = MoleculeFactory.make123Triazole();
-        
+
         // the original structure has no x,y coordinates (or so it seems).
         StructureDiagramGenerator sdg = new StructureDiagramGenerator(mole);
 
@@ -91,15 +91,15 @@ public class SVGRendererTest {
             Assert.assertEquals(Boolean.TRUE, b);
         }
     }
-    
+
     /**
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     @Test
     public void testAll() throws IOException {
         EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-        
+
         // walk through the /cml (with respect to the root of the project)
         Files.walkFileTree(Paths.get("cml"), opts, 2, new SimpleFileVisitor<Path>() {
             @Override
@@ -119,23 +119,23 @@ public class SVGRendererTest {
                             throw new IllegalArgumentException(file.toString(), e);
                         }
                         Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
-                        
+
                         // write it to the file
                         String svgFile = FilenameUtils.removeExtension(file.getFileName().toString()) + ".svg";
                         Boolean b = FileHandler.toFile(doc, file.resolveSibling(svgFile));
                         Assert.assertEquals(Boolean.TRUE, b);
                     }
                 }
-                
+
                 // move on
                 return FileVisitResult.CONTINUE;
             }
         });
     }
-    
+
     /**
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     @Test
     public void testDirectory() throws IOException {
@@ -143,5 +143,5 @@ public class SVGRendererTest {
         Cli.init(dummy);
         FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
     }
-    
+
 }

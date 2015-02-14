@@ -29,6 +29,7 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator.ZoomFactor;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.elements.WedgeLineElement;
 
+
 /**
  *
  *
@@ -50,16 +51,6 @@ public abstract class AbstractRenderer<T> {
      *
      */
     protected final double DEFAULT_YPAD = 2;
-
-    /**
-     *
-     */
-    protected static final double DEFAULT_WIDTH = 100.;
-
-    /**
-     *
-     */
-    protected static final double DEFAULT_HEIGHT = 100.;
 
     /**
      *
@@ -96,16 +87,12 @@ public abstract class AbstractRenderer<T> {
      */
     private Point2d drawingCentre = new Point2d(100, 100);
 
+    private Rectangle2D boundBox;
+
     /**
      *
      */
     private final List<IGenerator<IAtomContainer>> generators;
-
-    private static Double minX = Double.POSITIVE_INFINITY;
-    private static Double minY = Double.POSITIVE_INFINITY;
-    private static Double maxX = Double.NEGATIVE_INFINITY;
-    private static Double maxY = Double.NEGATIVE_INFINITY;
-
 
     /**
      *
@@ -249,10 +236,7 @@ public abstract class AbstractRenderer<T> {
         double[] i = new double[] {
             x, y
         };
-
         this.transform.transform(i, 0, i, 0, 1);
-
-        updateMinMax(i[0], i[1]);
         return new Point2d(i);
     }
 
@@ -299,8 +283,10 @@ public abstract class AbstractRenderer<T> {
      * @return
      */
     public T render(IAtomContainer atomContainer) {
+
+        this.boundBox = BoundsCalculator.calculateBounds(atomContainer);
         this.setScale(atomContainer);
-        this.setDrawingCentre(new Point2d(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2));
+        this.setDrawingCentre(new Point2d(getWidth() / 2, getHeight() /2));
         ElementGroup diagram = new ElementGroup();
         for(IGenerator<IAtomContainer> generator: this.getGenerators()) {
             diagram.add(generator.generate(atomContainer, this.getModel()));
@@ -317,6 +303,7 @@ public abstract class AbstractRenderer<T> {
      */
     protected T render(IRenderingElement element, IAtomContainer atomContainer) {
         Rectangle2D boundBox = BoundsCalculator.calculateBounds(atomContainer);
+        System.out.println("BBox 2: " + boundBox);
         this.setModelCentre(new Point2d(boundBox.getCenterX(), boundBox.getCenterY()));
 
         return this.render(element);
@@ -397,27 +384,13 @@ public abstract class AbstractRenderer<T> {
      */
     protected abstract void setStroke(T element);
 
-    protected final void updateMinMax(Double x, Double y) {
-        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
-        minX = Math.min(x, minX);
-        minY = Math.min(y, minY);
-        maxX = Math.max(x, maxX);
-        maxY = Math.max(y, maxY);
-        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
+
+    protected final Double getWidth() {
+        return boundBox.getWidth() * this.getScale() + 50;
     }
 
-    protected final String getViewBox() {
-        System.out.printf("%f %f %f %f\n", minX, minY, maxX, maxY);
-        return (minX - 20) + " " + (minY - 20) + " " +
-            (maxX + 20) + " " + (maxY + 20);
-    }
-
-    protected final String getWidth() {
-        return Double.toString(maxX - minX + 40.);
-    }
-
-    protected final String getHeight() {
-        return Double.toString(maxY - minY + 40.);
+    protected final Double getHeight() {
+        return boundBox.getHeight() * this.getScale() + 50;
     }
 
 }
