@@ -374,9 +374,14 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         this.setFill(rect);
         this.setStroke(rect);
 
+        if (element.getRelatedChemicalObject() != null) {
+            this.setColor(AtomColors.color((IAtom)element.getRelatedChemicalObject()));
+        } else {
+            this.setColor(element.color);
+        }
         // set the text colour
-        this.setColor(element.color);
         this.setFill(text);
+        this.setStroke(text);
         // set the text attributes
         text.setAttribute("font-family", this.DEFAULT_FONT.getFamily());
         text.setAttribute("font-size", Double.toString(this.DEFAULT_FONT.getSize2D() * this.getZoom()) + "px");
