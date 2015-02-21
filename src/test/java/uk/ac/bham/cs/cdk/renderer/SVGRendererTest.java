@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import uk.ac.bham.cs.cdk.renderer.generators.BasicAtomGenerator;
 import uk.ac.bham.cs.cdk.renderer.generators.BasicBondGenerator;
 import org.apache.commons.io.FilenameUtils;
+import java.io.File;
 
 
 /**
@@ -38,6 +39,7 @@ public class SVGRendererTest {
      *
      */
     protected SVGRenderer renderer;
+    protected String outputDir = "target/test-output";
 
     /**
      *
@@ -60,6 +62,31 @@ public class SVGRendererTest {
         this.renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
     }
 
+
+    private void makeDirectory(String prefix, String dir) {
+        File outputDir = new File(prefix, dir);
+        outputDir.mkdirs();
+    }
+    
+    
+    private void makeDirectory(String dir) {
+        this.makeDirectory(this.outputDir, dir);
+    }
+    
+    
+    /**
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testDirectory() throws IOException {
+        String[] dummy = {"-d", "cml", "-o", this.outputDir + "/cml"};
+        Cli.init(dummy);
+        this.makeDirectory(this.outputDir, "cml");
+        FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
+    }
+
+    
     /**
      *
      */
@@ -87,7 +114,10 @@ public class SVGRendererTest {
             Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
 
             // write it to the file
-            Boolean b = FileHandler.toFile(doc, /* fake path */ Paths.get("cml/triazole.svg"));
+            this.makeDirectory("all");
+            Boolean b = FileHandler.toFile(doc,
+                                           /* fake path */
+                                           Paths.get(this.outputDir + "/all" + "/triazole.svg"));
             Assert.assertEquals(Boolean.TRUE, b);
         }
     }
@@ -100,6 +130,7 @@ public class SVGRendererTest {
     public void testAll() throws IOException {
         EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 
+        this.makeDirectory("/cml");
         // walk through the /cml (with respect to the root of the project)
         Files.walkFileTree(Paths.get("cml"), opts, 2, new SimpleFileVisitor<Path>() {
             @Override
@@ -107,6 +138,7 @@ public class SVGRendererTest {
                 // are we looking at a CML file?
                 if(attrs.isRegularFile() && file.toString().toLowerCase().endsWith(".cml")) {
                     // read in the molecule from the CML
+                    System.out.println(file.toString());
                     IAtomContainer mole = FileHandler.fromFile(file);
                     Assert.assertNotEquals("Failed to get an IAtomContainer instance.", null, mole);
                     if(mole != null) {
@@ -122,7 +154,8 @@ public class SVGRendererTest {
 
                         // write it to the file
                         String svgFile = FilenameUtils.removeExtension(file.getFileName().toString()) + ".svg";
-                        Boolean b = FileHandler.toFile(doc, file.resolveSibling(svgFile));
+                        Boolean b = FileHandler.toFile(doc, Paths.get(SVGRendererTest.this.outputDir +
+                                                                      "/cml/", svgFile));
                         Assert.assertEquals(Boolean.TRUE, b);
                     }
                 }
@@ -131,17 +164,6 @@ public class SVGRendererTest {
                 return FileVisitResult.CONTINUE;
             }
         });
-    }
-
-    /**
-     *
-     * @throws IOException
-     */
-    @Test
-    public void testDirectory() throws IOException {
-        String[] dummy = {"-d", "cml"};
-        Cli.init(dummy);
-        FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
     }
 
 }

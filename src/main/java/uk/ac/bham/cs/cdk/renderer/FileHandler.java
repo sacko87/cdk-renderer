@@ -58,8 +58,8 @@ public class FileHandler {
 
     /**
      * 
-     * @param document
-     * @param path
+     * @param document The output document.
+     * @param path The output path.
      * @return 
      */
     public static Boolean toFile(Document document, Path path) {
