@@ -28,6 +28,8 @@ import uk.ac.bham.cs.cdk.renderer.generators.BasicAtomGenerator;
 import uk.ac.bham.cs.cdk.renderer.generators.BasicBondGenerator;
 import org.apache.commons.io.FilenameUtils;
 import java.io.File;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -67,13 +69,83 @@ public class SVGRendererTest {
         File outputDir = new File(prefix, dir);
         outputDir.mkdirs();
     }
-    
-    
+
+
     private void makeDirectory(String dir) {
         this.makeDirectory(this.outputDir, dir);
     }
-    
-    
+
+
+    private String[] factoryMolecules = new String[]{
+        "123Triazole",
+        "124Triazole",
+        "4x3CondensedRings",
+        "Adenine",
+        //"Alkane",
+        "AlphaPinene",
+        "Azulene",
+        "Benzene",
+        "BicycloRings",
+        "Biphenyl",
+        "BranchedAliphatic",
+        "Cyclobutadiene",
+        "Cyclobutane",
+        "Cyclohexane",
+        "Cyclohexene",
+        "Cyclopentane",
+        "Diamantane",
+        "EthylCyclohexane",
+        "EthylPropylPhenantren",
+        "FusedRings",
+        "Imidazole",
+        "Indole",
+        "Isothiazole",
+        "Isoxazole",
+        "MethylDecaline",
+        "Oxadiazole",
+        "Oxazole",
+        "PhenylAmine",
+        "PhenylEthylBenzene",
+        "Piperidine",
+        "PropylCycloPropane",
+        "Pyrazole",
+        "Pyridazine",
+        "Pyridine",
+        "PyridineOxide",
+        "Pyrimidine",
+        "Pyrrole",
+        "PyrroleAnion",
+        "Quinone",
+        "SingleRing",
+        "SpiroRings",
+        "Steran",
+        "Tetrahydropyran",
+        "Tetrazole",
+        "Thiadiazole",
+        "Thiazole",
+        "Triazine"
+    };
+
+
+    private Method createFactoryMethod(String name) {
+        Method method = null;
+        try {
+            method = Class.forName("org.openscience.cdk.templates.MoleculeFactory").getMethod("make" + name);
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class Error " + e.getMessage());
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            System.out.println("Security Error " + e.getMessage());
+            e.printStackTrace();
+        }
+        catch (NoSuchMethodException e) {
+            System.out.println("Method Error " + e.getMessage());
+            e.printStackTrace();
+        }
+        return method;
+    }
+
+
     /**
      *
      * @throws IOException
@@ -86,39 +158,84 @@ public class SVGRendererTest {
         FileHandler.translateDirectory(Cli.getOptionValue("dir"), renderer);
     }
 
-    
+
     /**
      *
      */
     @Test
     public void testFactory() {
-        // create a factory molecule
-        IAtomContainer mole = MoleculeFactory.make123Triazole();
+        this.makeDirectory("all");
+        for (String name : this.factoryMolecules) {
+            System.out.println("Generating: " + name);
+            // create a factory molecule
+            Method method = this.createFactoryMethod(name);
+            IAtomContainer mole = null;
+            try {
+                mole = (IAtomContainer)method.invoke(null);
+            } catch (IllegalAccessException e) {
+                System.out.println("Access Error " + e.getMessage());
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                System.out.println("Argument Error " + e.getMessage());
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                System.out.println("Invocation Error " + e.getMessage());
+                e.printStackTrace();
+            }
+            // the original structure has no x,y coordinates (or so it seems).
+            StructureDiagramGenerator sdg = new StructureDiagramGenerator(mole);
+            try {
+                // calculate the coordinates
+                sdg.generateCoordinates();
+            } catch (CDKException ex) {
+                Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
+                Assert.fail();
+            }
 
-        // the original structure has no x,y coordinates (or so it seems).
-        StructureDiagramGenerator sdg = new StructureDiagramGenerator(mole);
+            Path output = Paths.get(this.outputDir + "/all/" + name + ".svg");
+            // Translate to CML.
+            Class<?> params[] = new Class<?>[]{Path.class, IAtomContainer.class};
+            Method buildCML = null;
+            try {
+                buildCML = Class.forName("uk.ac.bham.cs.cdk.renderer.FileHandler").
+                    getDeclaredMethod("buildCML", params);
+            } catch (ClassNotFoundException e) {
+                System.out.println("Class Error " + e.getMessage());
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                System.out.println("Security Error " + e.getMessage());
+                e.printStackTrace();
+            }
+            catch (NoSuchMethodException e) {
+                System.out.println("Method Error " + e.getMessage());
+                e.printStackTrace();
+            }
+            buildCML.setAccessible(true);
+            try {
+                buildCML.invoke(null, output, sdg.getMolecule());
+            } catch (IllegalAccessException e) {
+                System.out.println("Access Error " + e.getMessage());
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                System.out.println("Argument Error " + e.getMessage());
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                System.out.println("Invocation Error " + e.getMessage());
+                e.printStackTrace();
+            }
+            // the original structure has no x,y coordinates (or so it seems).
+            //StructureDiagramGenerator sdg = new StructureDiagramGenerator(mole);
 
-        try {
-            // calculate the coordinates
-            sdg.generateCoordinates();
-        } catch (CDKException ex) {
-            Logger.getLogger(SVGRendererTest.class.getName()).log(Level.SEVERE, null, ex);
-            Assert.fail();
-        }
-
-        // refresh the molecule
-        mole = sdg.getMolecule();
-        if(mole != null) {
-            // render the molecule
-            Document doc = (Document) this.renderer.render(mole);
-            Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
-
-            // write it to the file
-            this.makeDirectory("all");
-            Boolean b = FileHandler.toFile(doc,
-                                           /* fake path */
-                                           Paths.get(this.outputDir + "/all" + "/triazole.svg"));
-            Assert.assertEquals(Boolean.TRUE, b);
+            // refresh the molecule
+            mole = sdg.getMolecule();
+            if(mole != null) {
+                // render the molecule
+                Document doc = (Document) this.renderer.render(mole);
+                Assert.assertNotEquals("Unable to render the IAtomContainer.", null, doc);
+                // write it to the file
+                Boolean b = FileHandler.toFile(doc, output);
+                Assert.assertEquals(Boolean.TRUE, b);
+            }
         }
     }
 
@@ -138,7 +255,6 @@ public class SVGRendererTest {
                 // are we looking at a CML file?
                 if(attrs.isRegularFile() && file.toString().toLowerCase().endsWith(".cml")) {
                     // read in the molecule from the CML
-                    System.out.println(file.toString());
                     IAtomContainer mole = FileHandler.fromFile(file);
                     Assert.assertNotEquals("Failed to get an IAtomContainer instance.", null, mole);
                     if(mole != null) {

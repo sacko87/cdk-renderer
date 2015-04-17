@@ -58,7 +58,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     protected Double base = 10.;      // Baseline of wedges.
     protected Double interval = 4.5;  // Interval for dashed and wavy bonds.
     protected Double wave = 5.;       // Extension of waves.
-    
+
     /**
      *
      * @param model
