@@ -26,9 +26,8 @@ import java.awt.Color;
  * @cdk.githash
  */
 @TestClass("org.openscience.cdk.renderer.elements.LineElementTest")
-public class LineElement
-extends AbstractRenderingElement
-implements IRenderingElement {
+public class LineElement extends AbstractRenderingElement
+    implements IRenderingElement {
 
   /** The x-coordinate of the first point. **/
   public final double firstPointX;
@@ -77,7 +76,7 @@ implements IRenderingElement {
     this.color = color;
   }
 
-  /** {@inheritDoc} **/
+
   @Override
   @TestMethod("testAccept")
   public void accept(final IRenderingVisitor visitor) {
@@ -93,10 +92,10 @@ implements IRenderingElement {
     TRIPLE(3),
     QUADRUPLE(4);
 
-    int n;
+    int count;
 
-    private LineType(final int n) {
-      this.n = n;
+    private LineType(final int count) {
+      this.count = count;
     }
 
     /**
@@ -105,7 +104,7 @@ implements IRenderingElement {
      * @return the count for this line type.
      */
     public int count() {
-      return this.n;
+      return this.count;
     }
   }
 }
