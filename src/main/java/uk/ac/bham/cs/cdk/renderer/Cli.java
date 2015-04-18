@@ -36,6 +36,7 @@ public final class Cli {
 	// Basic Options
         options.addOption("help", false, "Print this message");
         options.addOption("d", "dir", true, "Directory to parse");
+        options.addOption("j", "jessie", false, "JessieCode output");
         options.addOption("o", "output", true, "Output directory");
         
         CommandLineParser parser = new BasicParser();

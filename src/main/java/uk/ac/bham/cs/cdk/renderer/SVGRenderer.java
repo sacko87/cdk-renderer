@@ -153,7 +153,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     @Override
     protected Node render(LineElement element) {
-        Point2d point;
         Element line = line(this.XY(element.firstPointX, element.firstPointY),
                             this.XY(element.secondPointX, element.secondPointY));
         line.setAttribute("class", "bond");

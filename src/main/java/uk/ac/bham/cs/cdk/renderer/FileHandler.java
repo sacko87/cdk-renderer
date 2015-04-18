@@ -118,6 +118,13 @@ public class FileHandler {
     }
 
 
+  public static void translateFile(String fileName, JessieRenderer renderer) {
+    IAtomContainer mole = FileHandler.fromFile(Paths.get(fileName));
+    if (mole != null) {
+      System.out.println(renderer.render(mole));
+    }
+  }
+
     public static void translateFile(Path file, SVGRenderer renderer) {
         IAtomContainer mole = FileHandler.fromFile(file);
         if (mole != null) {

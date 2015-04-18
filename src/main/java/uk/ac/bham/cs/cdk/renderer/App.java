@@ -27,8 +27,15 @@ public class App {
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
         generators.add(new BasicAtomGenerator());
-        SVGRenderer renderer = new SVGRenderer(rendererModel, generators);
         // add my options
+        if (Cli.hasOption("j")) {
+          JessieRenderer renderer = new JessieRenderer(rendererModel, generators);
+          for (String file : Cli.getFiles()) {
+	    FileHandler.translateFile(file, renderer);
+          }
+          System.exit(0);
+        }
+        SVGRenderer renderer = new SVGRenderer(rendererModel, generators);
         renderer.getModel().set(BasicAtomGenerator.ShowExplicitHydrogens.class, true);
         renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
         if (Cli.hasOption("dir")) {

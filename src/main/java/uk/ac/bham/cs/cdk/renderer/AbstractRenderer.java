@@ -283,7 +283,6 @@ public abstract class AbstractRenderer<T> {
      * @return
      */
     public T render(IAtomContainer atomContainer) {
-
         this.boundBox = BoundsCalculator.calculateBounds(atomContainer);
         this.setScale(atomContainer);
         this.setDrawingCentre(new Point2d(getWidth() / 2, getHeight() /2));
@@ -291,7 +290,6 @@ public abstract class AbstractRenderer<T> {
         for(IGenerator<IAtomContainer> generator: this.getGenerators()) {
             diagram.add(generator.generate(atomContainer, this.getModel()));
         }
-
         return this.render(diagram, atomContainer);
     }
 
@@ -303,7 +301,6 @@ public abstract class AbstractRenderer<T> {
      */
     protected T render(IRenderingElement element, IAtomContainer atomContainer) {
         Rectangle2D boundBox = BoundsCalculator.calculateBounds(atomContainer);
-        System.out.println("BBox 2: " + boundBox);
         this.setModelCentre(new Point2d(boundBox.getCenterX(), boundBox.getCenterY()));
 
         return this.render(element);
@@ -318,7 +315,6 @@ public abstract class AbstractRenderer<T> {
         // save current colours/stroke
         Color  pColor = this.getColor();
         Stroke pStroke = this.getStroke();
-
         T result;
         // generate the result
         if(element instanceof WedgeLineElement) {
@@ -334,11 +330,9 @@ public abstract class AbstractRenderer<T> {
                     "The rendering of " + element.getClass().getCanonicalName()
                             + " is not supported.");
         }
-
         // restore the colours/strokes
         this.setColor(pColor);
         this.setStroke(pStroke);
-
         return result;
     }
 
