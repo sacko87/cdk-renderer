@@ -36,9 +36,8 @@ import java.util.List;
  * @cdk.githash
  */
 @TestClass("org.openscience.cdk.renderer.elements.ElementGroupTest")
-public class ElementGroup
-extends AbstractRenderingElement
-implements IRenderingElement, Iterable<IRenderingElement> {
+public class ElementGroup extends AbstractRenderingElement
+    implements IRenderingElement, Iterable<IRenderingElement> {
 
   /**
    * The elements in the group.
