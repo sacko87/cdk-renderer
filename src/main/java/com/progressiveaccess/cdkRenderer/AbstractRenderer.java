@@ -192,10 +192,10 @@ public abstract class AbstractRenderer<T> {
    */
   public final void setScale(final IAtomContainer atomContainer) {
     this.getModel()
-        .getParameter(Scale.class)
-        .setValue(
-            this.calculateScaleForBondLength(GeometryTools
-                .getBondLengthAverage(atomContainer)));
+    .getParameter(Scale.class)
+    .setValue(
+        this.calculateScaleForBondLength(GeometryTools
+            .getBondLengthAverage(atomContainer)));
     this.updateTransformer();
   }
 
@@ -338,7 +338,7 @@ public abstract class AbstractRenderer<T> {
     } else {
       throw new UnsupportedOperationException(
           "The rendering of " + element.getClass().getCanonicalName()
-              + " is not supported.");
+          + " is not supported.");
     }
     // restore the colours/strokes
     this.setColor(pColor);

@@ -9,7 +9,7 @@ import org.openscience.cdk.renderer.elements.AbstractRenderingElement;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
 
 public class BasicAtomGenerator extends
-    org.openscience.cdk.renderer.generators.BasicAtomGenerator {
+org.openscience.cdk.renderer.generators.BasicAtomGenerator {
   @Override
   public IRenderingElement generate(
       final IAtomContainer atomContainer, final IAtom atom,

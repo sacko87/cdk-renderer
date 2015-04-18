@@ -9,11 +9,11 @@ import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.tools.manipulator.RingSetManipulator;
 
 public class BasicBondGenerator extends
-    org.openscience.cdk.renderer.generators.BasicBondGenerator {
+org.openscience.cdk.renderer.generators.BasicBondGenerator {
   /**
    * Generate rendering element(s) for the current bond, including ring elements
    * if this bond is part of a ring.
-   * 
+   *
    * @param currentBond
    *          the bond to use when generating elements
    * @param model

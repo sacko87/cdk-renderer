@@ -19,7 +19,7 @@ public abstract class AbstractRenderingElement implements IRenderingElement {
   private IChemObject relatedChemicalObject;
 
   /**
-   * 
+   *
    * @return
    */
   public IChemObject getRelatedChemicalObject() {
@@ -27,7 +27,7 @@ public abstract class AbstractRenderingElement implements IRenderingElement {
   }
 
   /**
-   * 
+   *
    * @param chemicalObject
    */
   public void setRelatedChemicalObject(final IChemObject chemicalObject) {

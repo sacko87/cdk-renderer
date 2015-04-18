@@ -60,7 +60,7 @@ import javax.xml.transform.stream.StreamResult;
 public class FileHandler {
 
   /**
-   * 
+   *
    * @param document
    *          The output document.
    * @param path
@@ -95,7 +95,7 @@ public class FileHandler {
   }
 
   /**
-   * 
+   *
    * @param path
    * @return
    */
@@ -105,7 +105,7 @@ public class FileHandler {
       final InputStream file = new BufferedInputStream(new FileInputStream(
           path.toFile()));
       final ISimpleChemObjectReader reader = new ReaderFactory()
-          .createReader(file);
+      .createReader(file);
       IChemFile cFile = null;
       cFile = reader.read(SilentChemObjectBuilder.getInstance().
           newInstance(IChemFile.class));
@@ -154,17 +154,17 @@ public class FileHandler {
     try {
       Files.walkFileTree(Paths.get(pathName), opts, 2,
           new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                final BasicFileAttributes attrs) {
-              // are we looking at a CML file?
-              if (attrs.isRegularFile()) {
-                FileHandler.translateFile(file, renderer);
-              }
-              // move on
-              return FileVisitResult.CONTINUE;
-            }
-          });
+        @Override
+        public FileVisitResult visitFile(final Path file,
+            final BasicFileAttributes attrs) {
+          // are we looking at a CML file?
+          if (attrs.isRegularFile()) {
+            FileHandler.translateFile(file, renderer);
+          }
+          // move on
+          return FileVisitResult.CONTINUE;
+        }
+      });
     } catch (final IOException e) {
       // to show which file threw the exception
       Logger.getLogger("Incorrect file " + pathName).log(Level.SEVERE, null, e);
@@ -178,14 +178,14 @@ public class FileHandler {
         + extension;
     final Path newPath = Cli.hasOption("output") ? Paths.get(
         Cli.getOptionValue("output"), newFile) :
-        path.resolveSibling(newFile);
-    return newPath;
+          path.resolveSibling(newFile);
+        return newPath;
   }
 
   /**
    * Build the CML XOM element. Makes sure that we have object ids if the input
    * file is not a CML file. Writes the corresponding CML file.
-   * 
+   *
    * @throws IOException
    *           Problems with PrintWriter
    * @throws CDKException

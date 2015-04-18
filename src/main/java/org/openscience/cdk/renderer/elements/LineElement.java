@@ -27,8 +27,8 @@ import java.awt.Color;
  */
 @TestClass("org.openscience.cdk.renderer.elements.LineElementTest")
 public class LineElement
-    extends AbstractRenderingElement
-    implements IRenderingElement {
+extends AbstractRenderingElement
+implements IRenderingElement {
 
   /** The x-coordinate of the first point. **/
   public final double firstPointX;
@@ -50,7 +50,7 @@ public class LineElement
 
   /**
    * Make a line element.
-   * 
+   *
    * @param firstPointX
    *          x-coordinate of the first point
    * @param firstPointY
