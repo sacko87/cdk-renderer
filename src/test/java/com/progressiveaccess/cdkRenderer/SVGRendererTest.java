@@ -1,7 +1,24 @@
-package uk.ac.bham.cs.cdk.renderer;
+package com.progressiveaccess.cdkRenderer;
 
 
+import com.progressiveaccess.cdkRenderer.generators.BasicAtomGenerator;
+
+import org.apache.commons.io.FilenameUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.generators.BasicBondGenerator;
+import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
+import org.openscience.cdk.renderer.generators.IGenerator;
+import org.w3c.dom.Document;
+
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -14,22 +31,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.layout.StructureDiagramGenerator;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
-import org.openscience.cdk.renderer.generators.IGenerator;
-import org.openscience.cdk.templates.MoleculeFactory;
-import org.w3c.dom.Document;
-import uk.ac.bham.cs.cdk.renderer.generators.BasicAtomGenerator;
-import uk.ac.bham.cs.cdk.renderer.generators.BasicBondGenerator;
-import org.apache.commons.io.FilenameUtils;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -197,7 +198,7 @@ public class SVGRendererTest {
             Class<?> params[] = new Class<?>[]{Path.class, IAtomContainer.class};
             Method buildCML = null;
             try {
-                buildCML = Class.forName("uk.ac.bham.cs.cdk.renderer.FileHandler").
+                buildCML = Class.forName("com.progressiveaccess.cdkRenderer.FileHandler").
                     getDeclaredMethod("buildCML", params);
             } catch (ClassNotFoundException e) {
                 System.out.println("Class Error " + e.getMessage());
