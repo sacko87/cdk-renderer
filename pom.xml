@@ -38,7 +38,7 @@
           <projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
           <programs>
             <program>
-              <mainClass>uk.ac.bham.cs.cdk.renderer.App</mainClass>
+              <mainClass>com.progressiveaccess.cdkRenderer.App</mainClass>
               <name>render</name>
             </program>
           </programs>
