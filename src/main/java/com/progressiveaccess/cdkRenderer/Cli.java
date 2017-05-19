@@ -37,6 +37,7 @@ public final class Cli {
     options.addOption("d", "dir", true, "Directory to parse");
     options.addOption("j", "jessie", false, "JessieCode output");
     options.addOption("o", "output", true, "Output directory");
+    options.addOption("e", "explicit", false, "Explicit Carbons");
 
     final CommandLineParser parser = new BasicParser();
     try {
