@@ -517,9 +517,9 @@ public class SVGRenderer extends AbstractRenderer<Node> {
       maxDist = Math.max(maxDist, dist);
     }
     circle.setAttribute("r", String.valueOf(.33 * maxDist));
+    circle.setAttribute("fill", "none");
+    circle.setAttribute("fill-opacity", "0.0");
     this.setStroke(circle);
-    this.setColor(Color.WHITE);
-    this.setFill(circle);
     return circle;
   }
 }
