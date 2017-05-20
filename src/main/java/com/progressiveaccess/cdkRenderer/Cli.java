@@ -38,6 +38,8 @@ public final class Cli {
     options.addOption("j", "jessie", false, "JessieCode output");
     options.addOption("o", "output", true, "Output directory");
     options.addOption("e", "explicit", false, "Explicit Carbons");
+    options.addOption("xr", "exclude_rings", false,
+                      "No explicit carbons in aromatic rings");
 
     final CommandLineParser parser = new BasicParser();
     try {

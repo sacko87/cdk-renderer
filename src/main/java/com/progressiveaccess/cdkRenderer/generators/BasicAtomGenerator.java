@@ -19,6 +19,10 @@ org.openscience.cdk.renderer.generators.BasicAtomGenerator {
     if (!Cli.hasOption("explicit")
         && !this.canDraw(atom, atomContainer, model)) {
       result = null;
+    } else if (Cli.hasOption("exclude_rings") &&
+               atom.getSymbol().equals("C") &&
+               atom.isAromatic()) {
+      result = null;
     } else if (model.get(CompactAtom.class)) {
       result = this.generateCompactElement(atom, model);
     } else {

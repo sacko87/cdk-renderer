@@ -499,7 +499,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
   @Override
   protected Node render(final OvalElement element) {
-    System.out.println("RENDERING!");
     final Element circle = this.document.createElementNS(SVG_NS, "circle");
     final Point2d center = this.XY(element.xCoord, element.yCoord);
     final Point2d radius = this.XY(element.radius, element.radius);
