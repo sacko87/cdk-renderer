@@ -21,6 +21,8 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator.Scale;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.ZoomFactor;
 import org.openscience.cdk.renderer.generators.IGenerator;
 
+import org.openscience.cdk.renderer.elements.MarkedElement;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,6 +32,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.vecmath.Point2d;
+import org.openscience.cdk.renderer.elements.OvalElement;
 
 /**
  *
@@ -321,12 +324,15 @@ public abstract class AbstractRenderer<T> {
    * @param element
    * @return
    */
-  protected T render(final IRenderingElement element) {
+  protected T render(IRenderingElement element) {
     // save current colours/stroke
     final Color pColor = this.getColor();
     final Stroke pStroke = this.getStroke();
     T result;
     // generate the result
+    if (element instanceof MarkedElement) {
+      element = ((MarkedElement) element).element();
+    }
     if (element instanceof WedgeLineElement) {
       result = this.render((WedgeLineElement) element);
     } else if (element instanceof LineElement) {
@@ -335,6 +341,8 @@ public abstract class AbstractRenderer<T> {
       result = this.render((ElementGroup) element);
     } else if (element instanceof AtomSymbolElement) {
       result = this.render((AtomSymbolElement) element);
+    } else if (element instanceof OvalElement) {
+      result = this.render((OvalElement) element);
     } else {
       throw new UnsupportedOperationException(
           "The rendering of " + element.getClass().getCanonicalName()
@@ -358,6 +366,15 @@ public abstract class AbstractRenderer<T> {
    * @param element
    * @return
    */
+  protected T render(MarkedElement element) {
+    return null;
+  };
+
+  /**
+   *
+   * @param element
+   * @return
+   */
   protected abstract T render(LineElement element);
 
   /**
@@ -373,6 +390,13 @@ public abstract class AbstractRenderer<T> {
    * @return
    */
   protected abstract T render(AtomSymbolElement element);
+
+  /**
+   *
+   * @param element
+   * @return
+   */
+  protected abstract T render(OvalElement element);
 
   /**
    *

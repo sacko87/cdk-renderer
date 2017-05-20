@@ -36,6 +36,8 @@ import java.awt.Color;
 import java.util.List;
 
 import javax.vecmath.Point2d;
+import org.openscience.cdk.renderer.elements.OvalElement;
+import org.openscience.cdk.interfaces.IRing;
 
 /**
  *
@@ -493,5 +495,32 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     // return the group
     return group.hasChildNodes() ? group : null;
+  }
+
+  @Override
+  protected Node render(final OvalElement element) {
+    System.out.println("RENDERING!");
+    final Element circle = this.document.createElementNS(SVG_NS, "circle");
+    final Point2d center = this.XY(element.xCoord, element.yCoord);
+    final Point2d radius = this.XY(element.radius, element.radius);
+    circle.setAttribute("cx", String.valueOf(center.x));
+    circle.setAttribute("cy", String.valueOf(center.y));
+    // Compute radius
+    Double maxDist = 0.;
+    final IRing ring = (IRing)element.getRelatedChemicalObject();
+    final IAtom refAtom = ring.getAtom(0);
+    Point2d refPoint = this.XY(refAtom.getPoint2d().x, refAtom.getPoint2d().y);
+    for (IAtom atom: ring.atoms()) {
+      Point2d newPoint = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
+      Double dx = newPoint.x - refPoint.x;
+      Double dy = newPoint.y - refPoint.y;
+      Double dist = Math.sqrt(dx * dx + dy * dy);
+      maxDist = Math.max(maxDist, dist);
+    }
+    circle.setAttribute("r", String.valueOf(.33 * maxDist));
+    this.setStroke(circle);
+    this.setColor(Color.WHITE);
+    this.setFill(circle);
+    return circle;
   }
 }

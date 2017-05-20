@@ -20,9 +20,6 @@
 
 package org.openscience.cdk.renderer.elements;
 
-import org.openscience.cdk.annotations.TestClass;
-import org.openscience.cdk.annotations.TestMethod;
-
 import java.awt.Color;
 
 /**
@@ -31,7 +28,6 @@ import java.awt.Color;
  * @cdk.module render
  * @cdk.githash
  */
-@TestClass("org.openscience.cdk.renderer.elements.TextElementTest")
 public class TextElement extends AbstractRenderingElement implements
 IRenderingElement {
 
@@ -60,7 +56,6 @@ IRenderingElement {
    * @param color
    *          the color of the text
    */
-  @TestMethod("testConstructor")
   public TextElement(final double xCoord, final double yCoord,
       final String text, final Color color) {
     this.xCoord = xCoord;
@@ -71,7 +66,6 @@ IRenderingElement {
 
   /** {@inheritDoc} */
   @Override
-  @TestMethod("testAccept")
   public void accept(final IRenderingVisitor visotor) {
     visotor.visit(this);
   }
