@@ -413,8 +413,11 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     // create a fragement
     final DocumentFragment df = this.document.createDocumentFragment();
     // create the core text for the atom
-    final Node elem = text.appendChild(this.document
-                                       .createTextNode(element.text));
+    // TODO (sorge): Is this the right position to deal with R elements?
+    //       Mark them for postprocessing to put them in an adequate place.
+    final Node elem = text
+      .appendChild(this.document
+                   .createTextNode(element.text.equals(" ") ? "R" : element.text));
     // do we want to show explicitly the hydogen counts?
     // do we have any?
     if (showExplicitHydrogens && element.hydrogenCount > 0) {
