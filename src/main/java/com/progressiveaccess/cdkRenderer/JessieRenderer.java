@@ -14,6 +14,7 @@ import org.openscience.cdk.renderer.generators.IGenerator;
 import java.util.List;
 
 import javax.vecmath.Point2d;
+import org.openscience.cdk.renderer.elements.OvalElement;
 
 /**
  * Renders output for Jessie. This is highly experimental and incomplete!
@@ -93,6 +94,12 @@ public class JessieRenderer extends AbstractRenderer<String> {
         xy.x, xy.y, id, element.text);
   }
 
+  @Override
+  protected String render(final OvalElement element) {
+    // TODO
+    return null;
+  }
+  
   @Override
   protected void setFill(final String element) {
   }

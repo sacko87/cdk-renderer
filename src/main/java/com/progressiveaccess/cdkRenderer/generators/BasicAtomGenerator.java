@@ -7,6 +7,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.elements.AbstractRenderingElement;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
+import com.progressiveaccess.cdkRenderer.Cli;
 
 public class BasicAtomGenerator extends
 org.openscience.cdk.renderer.generators.BasicAtomGenerator {
@@ -15,8 +16,12 @@ org.openscience.cdk.renderer.generators.BasicAtomGenerator {
       final IAtomContainer atomContainer, final IAtom atom,
       final RendererModel model) {
     IRenderingElement result;
-
-    if (!this.canDraw(atom, atomContainer, model)) {
+    if (!Cli.hasOption("explicit")
+        && !this.canDraw(atom, atomContainer, model)) {
+      result = null;
+    } else if (Cli.hasOption("exclude_rings") &&
+               atom.getSymbol().equals("C") &&
+               atom.isAromatic()) {
       result = null;
     } else if (model.get(CompactAtom.class)) {
       result = this.generateCompactElement(atom, model);

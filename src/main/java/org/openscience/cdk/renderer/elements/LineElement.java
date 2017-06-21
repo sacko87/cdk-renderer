@@ -14,9 +14,6 @@
 
 package org.openscience.cdk.renderer.elements;
 
-import org.openscience.cdk.annotations.TestClass;
-import org.openscience.cdk.annotations.TestMethod;
-
 import java.awt.Color;
 
 /**
@@ -25,7 +22,6 @@ import java.awt.Color;
  * @cdk.module renderbasic
  * @cdk.githash
  */
-@TestClass("org.openscience.cdk.renderer.elements.LineElementTest")
 public class LineElement extends AbstractRenderingElement
     implements IRenderingElement {
 
@@ -63,7 +59,6 @@ public class LineElement extends AbstractRenderingElement
    * @param color
    *          the color of the line
    */
-  @TestMethod("testConstructor")
   public LineElement(
       final double firstPointX, final double firstPointY,
       final double secondPointX, final double secondPointY,
@@ -78,7 +73,6 @@ public class LineElement extends AbstractRenderingElement
 
 
   @Override
-  @TestMethod("testAccept")
   public void accept(final IRenderingVisitor visitor) {
     visitor.visit(this);
   }

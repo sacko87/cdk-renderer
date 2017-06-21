@@ -166,6 +166,8 @@ public class SVGRendererTest {
    */
   @Test
   public void testFactory() {
+    final String[] dummy = {};
+    Cli.init(dummy);
     this.makeDirectory("all");
     for (final String name : this.factoryMolecules) {
       System.out.println("Generating: " + name);

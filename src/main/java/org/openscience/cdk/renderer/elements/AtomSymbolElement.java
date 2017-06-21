@@ -22,9 +22,6 @@
 
 package org.openscience.cdk.renderer.elements;
 
-import org.openscience.cdk.annotations.TestClass;
-import org.openscience.cdk.annotations.TestMethod;
-
 import java.awt.Color;
 
 /**
@@ -33,7 +30,6 @@ import java.awt.Color;
  * @cdk.module renderbasic
  * @cdk.githash
  */
-@TestClass("org.openscience.cdk.renderer.elements.AtomSymbolElementTest")
 public class AtomSymbolElement extends TextElement {
 
   /** The formal charge. */
@@ -45,7 +41,6 @@ public class AtomSymbolElement extends TextElement {
   /** The hydrogen alignment. */
   public final int alignment;
 
-  @TestMethod("testConstructor")
   public AtomSymbolElement(final double x, final double y, final String symbol,
       final Integer formalCharge, final Integer hydrogenCount,
       final int alignment, final Color color) {
@@ -57,7 +52,6 @@ public class AtomSymbolElement extends TextElement {
 
   /** {@inheritDoc} */
   @Override
-  @TestMethod("testAccept")
   public void accept(final IRenderingVisitor v) {
     v.visit(this);
   }

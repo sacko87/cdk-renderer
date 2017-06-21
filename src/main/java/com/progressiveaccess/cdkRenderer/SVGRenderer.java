@@ -36,6 +36,8 @@ import java.awt.Color;
 import java.util.List;
 
 import javax.vecmath.Point2d;
+import org.openscience.cdk.renderer.elements.OvalElement;
+import org.openscience.cdk.interfaces.IRing;
 
 /**
  *
@@ -404,79 +406,79 @@ public class SVGRenderer extends AbstractRenderer<Node> {
         Double.toString(this.DEFAULT_FONT.getSize2D() * this.getZoom()) + "px");
 
     final Boolean showExplicitHydrogens =
-        this.getModel().hasParameter(
-            BasicAtomGenerator.ShowExplicitHydrogens.class)
-            ? this.getModel().get(
-                BasicAtomGenerator.ShowExplicitHydrogens.class)
-                : this.getModel().getDefault(
-                    BasicAtomGenerator.ShowExplicitHydrogens.class);
+      this.getModel().hasParameter(BasicAtomGenerator.ShowExplicitHydrogens.class) ?
+      this.getModel().get(BasicAtomGenerator.ShowExplicitHydrogens.class)
+      : this.getModel().getDefault(BasicAtomGenerator.ShowExplicitHydrogens.class);
 
-                // create a fragement
-                final DocumentFragment df = this.document.createDocumentFragment();
-                // create the core text for the atom
-                final Node elem = text.appendChild(this.document
-                    .createTextNode(element.text));
-                // do we want to show explicitly the hydogen counts?
-                // do we have any?
-                if (showExplicitHydrogens && element.hydrogenCount > 0) {
-                  // room for the hydrogen
-                  final DocumentFragment Hx = this.document.createDocumentFragment();
-                  // create the hydrogen atom
-                  Hx.appendChild(this.document.createTextNode("H"));
-                  // is there more than one?
-                  if (element.hydrogenCount > 1) {
-                    // create some space
-                    final Element n = this.document.createElementNS(SVG_NS, "tspan");
-                    n.setAttribute("baseline-shift", "-5px");
-                    // add the count to it
-                    n.appendChild(this.document.createTextNode(Integer
-                        .toString(element.hydrogenCount)));
-                    Hx.appendChild(n);
-                  }
+    // create a fragement
+    final DocumentFragment df = this.document.createDocumentFragment();
+    // create the core text for the atom
+    // TODO (sorge): Is this the right position to deal with R elements?
+    //       Mark them for postprocessing to put them in an adequate place.
+    final Node elem = text
+      .appendChild(this.document
+                   .createTextNode(element.text.equals(" ") ? "R" : element.text));
+    // do we want to show explicitly the hydogen counts?
+    // do we have any?
+    if (showExplicitHydrogens && element.hydrogenCount > 0) {
+      // room for the hydrogen
+      final DocumentFragment Hx = this.document.createDocumentFragment();
+      // create the hydrogen atom
+      Hx.appendChild(this.document.createTextNode("H"));
+      // is there more than one?
+      if (element.hydrogenCount > 1) {
+        // create some space
+        final Element n = this.document.createElementNS(SVG_NS, "tspan");
+        n.setAttribute("baseline-shift", "-5px");
+        // add the count to it
+        n.appendChild(this.document
+                      .createTextNode(Integer.toString(element.hydrogenCount)));
+        Hx.appendChild(n);
+      }
 
-                  // before or after
-                  // add elements in order
-                  if (element.alignment == 2) {
-                    df.appendChild(elem);
-                    df.appendChild(Hx);
-                  } else {
-                    df.appendChild(Hx);
-                    df.appendChild(elem);
-                  }
-                } else {
-                  // just add atom
-                  df.appendChild(elem);
-                }
+      // before or after
+      // add elements in order
+      if (element.alignment == 2) {
+        df.appendChild(elem);
+        df.appendChild(Hx);
+      } else {
+        df.appendChild(Hx);
+        df.appendChild(elem);
+      }
+    } else {
+      // just add atom
+      df.appendChild(elem);
+    }
 
-                text.appendChild(df);
+    text.appendChild(df);
 
-                // transform the given (x,y) coordinates
-                final Point2d xy = this.XY(element.xCoord, element.yCoord);
+    // transform the given (x,y) coordinates
+    final Point2d xy = this.XY(element.xCoord, element.yCoord);
 
-                // get the width and height of the element
-                final Point2d b = this.WH(text);
-                final Double w = b.x; // width
-                final Double h = b.y; // hight
+    // get the width and height of the element
+    final Point2d b = this.WH(text);
+    final Double w = b.x; // width
+    final Double h = b.y; // hight
 
-                // setup the background
-                rect.setAttribute(
-                    "x",
-                    Double.toString(xy.x - (w / 2)
+    // setup the background
+    rect.setAttribute("x",
+        Double.toString(xy.x - (w / 2)
                         - ((this.DEFAULT_XPAD * this.getZoom()) / 2)));
-                rect.setAttribute(
-                    "y",
-                    Double.toString(xy.y - (-h / 2) - h
+    rect.setAttribute("y",
+        Double.toString(xy.y - (-h / 2) - h
                         - ((this.DEFAULT_YPAD * this.getZoom()) / 2)));
-                rect.setAttribute("width",
-                    Double.toString(w + (this.DEFAULT_XPAD * this.getZoom())));
-                rect.setAttribute("height",
-                    Double.toString(h + (this.DEFAULT_YPAD * this.getZoom())));
+    rect.setAttribute("width",
+                      Double.toString(w +
+                                      (this.DEFAULT_XPAD * this.getZoom())));
+    rect.setAttribute("height",
+                      Double.toString(h +
+                                      (this.DEFAULT_YPAD * this.getZoom())));
 
-                // setup the text to be on top
-                text.setAttribute("x", Double.toString(xy.x - (w / 2)));
-                text.setAttribute("y", Double.toString(xy.y - (-h / 2)));
+    // setup the text to be on top
+    text.setAttribute("x", Double.toString(xy.x - (w / 2)));
+    text.setAttribute("y", Double.toString(xy.y - (-h / 2)));
 
-                return group;
+    return group;
   }
 
   @Override
@@ -496,5 +498,31 @@ public class SVGRenderer extends AbstractRenderer<Node> {
 
     // return the group
     return group.hasChildNodes() ? group : null;
+  }
+
+  @Override
+  protected Node render(final OvalElement element) {
+    final Element circle = this.document.createElementNS(SVG_NS, "circle");
+    final Point2d center = this.XY(element.xCoord, element.yCoord);
+    final Point2d radius = this.XY(element.radius, element.radius);
+    circle.setAttribute("cx", String.valueOf(center.x));
+    circle.setAttribute("cy", String.valueOf(center.y));
+    // Compute radius
+    Double maxDist = 0.;
+    final IRing ring = (IRing)element.getRelatedChemicalObject();
+    final IAtom refAtom = ring.getAtom(0);
+    Point2d refPoint = this.XY(refAtom.getPoint2d().x, refAtom.getPoint2d().y);
+    for (IAtom atom: ring.atoms()) {
+      Point2d newPoint = this.XY(atom.getPoint2d().x, atom.getPoint2d().y);
+      Double dx = newPoint.x - refPoint.x;
+      Double dy = newPoint.y - refPoint.y;
+      Double dist = Math.sqrt(dx * dx + dy * dy);
+      maxDist = Math.max(maxDist, dist);
+    }
+    circle.setAttribute("r", String.valueOf(.33 * maxDist));
+    circle.setAttribute("fill", "none");
+    circle.setAttribute("fill-opacity", "0.0");
+    this.setStroke(circle);
+    return circle;
   }
 }

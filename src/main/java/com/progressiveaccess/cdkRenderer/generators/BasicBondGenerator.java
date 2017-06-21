@@ -7,6 +7,7 @@ import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.elements.AbstractRenderingElement;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.tools.manipulator.RingSetManipulator;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 public class BasicBondGenerator extends
 org.openscience.cdk.renderer.generators.BasicBondGenerator {
@@ -23,11 +24,21 @@ org.openscience.cdk.renderer.generators.BasicBondGenerator {
   @Override
   public IRenderingElement generate(final IBond currentBond,
       final RendererModel model) {
-    final IRing ring = RingSetManipulator.getHeaviestRing(this.ringSet,
-        currentBond);
+    // TODO: Prevent drawing of multiple rings by taking only the smallest!
+    // What if we have multiple smallest, e.g., ovalene with rings?
+    IRing ring = null;
+    if (currentBond.isAromatic()) {
+      for (IAtomContainer container: this.ringSet.atomContainers()) {
+        if (container.contains(currentBond)) {
+          ring = (IRing)container;
+          break;
+        }
+      }
+    }
     IRenderingElement result;
     if (ring != null) {
-      result = this.generateRingElements(currentBond, ring, model);
+      RingGenerator ringGen = new RingGenerator();
+      result = ringGen.generateRingElements(currentBond, ring, model);
     } else {
       result = this.generateBond(currentBond, model);
     }
