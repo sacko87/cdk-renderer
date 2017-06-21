@@ -6,9 +6,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bham.cs.cdk</groupId>
   <artifactId>render</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
+    <cdk.version>2.0</cdk.version>
+    <batik.version>1.8</batik.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <build>
@@ -74,7 +76,7 @@
     <dependency>
       <groupId>org.openscience.cdk</groupId>
       <artifactId>cdk-bundle</artifactId>
-      <version>1.5.15</version>
+      <version>${cdk.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -82,16 +84,32 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-svg-dom</artifactId>
-      <version>1.6-1</version>
+      <version>${batik.version}</version>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>2.2</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-bridge</artifactId>
-      <version>1.6-1</version>
-      <type>jar</type>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-anim</artifactId>
+      <version>${batik.version}</version>
     </dependency>
     <dependency>        
       <groupId>commons-cli</groupId>
@@ -106,18 +124,8 @@
     <dependency>
       <groupId>org.openscience.cdk</groupId>
       <artifactId>cdk-interfaces</artifactId>
-      <version>1.5.15</version>
-      <type>jar</type>
+      <version>${cdk.version}</version>
     </dependency>
-    <!--
-        <dependency>
-        <groupId>cdk</groupId>
-        <artifactId>cdk-interfaces</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
-        <type>jar</type>
-        </dependency>
-    -->
-    
   </dependencies>
   <repositories>
     <repository>
