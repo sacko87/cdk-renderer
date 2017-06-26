@@ -28,9 +28,11 @@ org.openscience.cdk.renderer.generators.RingGenerator {
                                                 final IRing ring,
                                                 final RendererModel model) {
     IRenderingElement result = super.generateRingElements(bond, ring, model);
-    for (IRenderingElement element: (ElementGroup)result) {
-      if (element instanceof OvalElement) {
-        ((AbstractRenderingElement) element).setRelatedChemicalObject(ring);
+    if(result instanceof ElementGroup) {
+      for (IRenderingElement element: (ElementGroup) result) {
+        if (element instanceof OvalElement) {
+          ((AbstractRenderingElement) element).setRelatedChemicalObject(ring);
+        }
       }
     }
     return result;
