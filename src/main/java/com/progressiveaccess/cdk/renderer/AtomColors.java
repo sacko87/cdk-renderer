@@ -10,7 +10,7 @@
 
 //
 
-package com.progressiveaccess.cdkRenderer;
+package com.progressiveaccess.cdk.renderer;
 
 import org.openscience.cdk.interfaces.IAtom;
 

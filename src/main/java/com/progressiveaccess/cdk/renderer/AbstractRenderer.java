@@ -4,23 +4,25 @@
  * in the editor.
  */
 
-package com.progressiveaccess.cdkRenderer;
+package com.progressiveaccess.cdk.renderer;
 
 // i'm being nice
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.renderer.BoundsCalculator;
 import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.elements.AtomSymbolElement;
-import org.openscience.cdk.renderer.elements.ElementGroup;
-import org.openscience.cdk.renderer.elements.IRenderingElement;
-import org.openscience.cdk.renderer.elements.LineElement;
-import org.openscience.cdk.renderer.elements.WedgeLineElement;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.Scale;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator.ZoomFactor;
-import org.openscience.cdk.renderer.generators.IGenerator;
 
+import com.progressiveaccess.cdk.renderer.elements.AtomSymbolElement;
+import com.progressiveaccess.cdk.renderer.elements.ElementGroup;
+import com.progressiveaccess.cdk.renderer.elements.LineElement;
+import com.progressiveaccess.cdk.renderer.elements.OvalElement;
+import com.progressiveaccess.cdk.renderer.elements.WedgeLineElement;
+
+import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.renderer.elements.MarkedElement;
 
 import java.awt.BasicStroke;
@@ -32,13 +34,12 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.vecmath.Point2d;
-import org.openscience.cdk.renderer.elements.OvalElement;
 
 /**
  *
  *
- * @author sacko
- * @param <T>
+ * @author John T. Saxon
+ * @param <T> the type of output.
  */
 public abstract class AbstractRenderer<T> {
   /**
@@ -328,12 +329,11 @@ public abstract class AbstractRenderer<T> {
     // save current colours/stroke
     final Color pColor = this.getColor();
     final Stroke pStroke = this.getStroke();
-    T result;
+    T result = null;
     // generate the result
     if (element instanceof MarkedElement) {
-      element = ((MarkedElement) element).element();
-    }
-    if (element instanceof WedgeLineElement) {
+      result = this.render((MarkedElement) element);
+    } else if (element instanceof WedgeLineElement) {
       result = this.render((WedgeLineElement) element);
     } else if (element instanceof LineElement) {
       result = this.render((LineElement) element);
@@ -367,8 +367,8 @@ public abstract class AbstractRenderer<T> {
    * @return
    */
   protected T render(MarkedElement element) {
-    return null;
-  };
+    return this.render(element.element());
+  }
 
   /**
    *
@@ -417,5 +417,4 @@ public abstract class AbstractRenderer<T> {
   protected final Double getHeight() {
     return this.boundBox.getHeight() * this.getScale() + 50;
   }
-
 }

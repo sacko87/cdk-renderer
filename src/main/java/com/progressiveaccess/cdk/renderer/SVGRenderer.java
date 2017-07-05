@@ -4,7 +4,7 @@
  * in the editor.
  */
 
-package com.progressiveaccess.cdkRenderer;
+package com.progressiveaccess.cdk.renderer;
 
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.bridge.DocumentLoader;
@@ -16,12 +16,8 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.elements.AbstractRenderingElement;
-import org.openscience.cdk.renderer.elements.AtomSymbolElement;
-import org.openscience.cdk.renderer.elements.ElementGroup;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
-import org.openscience.cdk.renderer.elements.LineElement;
-import org.openscience.cdk.renderer.elements.WedgeLineElement;
+import org.openscience.cdk.renderer.elements.MarkedElement;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.w3c.dom.Document;
@@ -31,12 +27,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGRect;
 
+import com.progressiveaccess.cdk.renderer.elements.AtomSymbolElement;
+import com.progressiveaccess.cdk.renderer.elements.ElementGroup;
+import com.progressiveaccess.cdk.renderer.elements.ILinkedElement;
+import com.progressiveaccess.cdk.renderer.elements.LineElement;
+import com.progressiveaccess.cdk.renderer.elements.OvalElement;
+import com.progressiveaccess.cdk.renderer.elements.WedgeLineElement;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.List;
 
 import javax.vecmath.Point2d;
-import org.openscience.cdk.renderer.elements.OvalElement;
+
 import org.openscience.cdk.interfaces.IRing;
 
 /**
@@ -105,17 +108,9 @@ public class SVGRenderer extends AbstractRenderer<Node> {
    * @param svgElement
    * @param element
    */
-  private void setId(final Node node, final IRenderingElement element) {
-  }
-
-  /**
-   *
-   * @param svgElement
-   * @param element
-   */
-  private void setId(final Element node, final AbstractRenderingElement element) {
-    if (element.getRelatedChemicalObject() != null) {
-      node.setAttribute("id", element.getRelatedChemicalObject().getID());
+  private void setId(final Element node, final ILinkedElement element) {
+    if (element.getChemicalObject() != null) {
+      node.setAttribute("id", element.getChemicalObject().getID());
     }
   }
 
@@ -165,17 +160,17 @@ public class SVGRenderer extends AbstractRenderer<Node> {
   }
 
   @Override
-  protected Node render(final LineElement element) {
+  protected Element render(final LineElement element) {
     final Element line = this.line(
         this.XY(element.firstPointX, element.firstPointY),
         this.XY(element.secondPointX, element.secondPointY));
-    line.setAttribute("class", "bond");
     this.setId(line, element);
+    line.setAttribute("class", "bond");
     return line;
   }
 
   @Override
-  protected Node render(final WedgeLineElement element) {
+  protected Element render(final WedgeLineElement element) {
     Point2d start, end;
     switch (element.direction) {
       case toFirst:
@@ -203,7 +198,6 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     }
     // styling
     node.setAttribute("class", "bond");
-    // if attached to IChemObject
     this.setId(node, element);
 
     return node;
@@ -299,8 +293,8 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     private void scaleDistance(final WedgeLineElement element,
         final Point2d start,
         final Point2d end, final UnitVector unit) {
-      if (element.getRelatedChemicalObject() != null) {
-        for (final IAtom atom : ((IBond) element.getRelatedChemicalObject())
+      if (element.getChemicalObject() != null) {
+        for (final IAtom atom : ((IBond) element.getChemicalObject())
             .atoms()) {
           final Point2d point = SVGRenderer.this.XY(atom.getPoint2d().x,
               atom.getPoint2d().y);
@@ -374,7 +368,7 @@ public class SVGRenderer extends AbstractRenderer<Node> {
   }
 
   @Override
-  protected Node render(final AtomSymbolElement element) {
+  protected Element render(final AtomSymbolElement element) {
     // create the required elements
     final Element group = this.document.createElementNS(SVG_NS, "g");
     final Element rect = this.document.createElementNS(SVG_NS, "rect");
@@ -392,8 +386,8 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     this.setFill(rect);
     this.setStroke(rect);
 
-    if (element.getRelatedChemicalObject() != null) {
-      this.setColor(AtomColors.color((IAtom) element.getRelatedChemicalObject()));
+    if (element.getChemicalObject() != null) {
+      this.setColor(AtomColors.color((IAtom) element.getChemicalObject()));
     } else {
       this.setColor(element.color);
     }
@@ -477,12 +471,14 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     // setup the text to be on top
     text.setAttribute("x", Double.toString(xy.x - (w / 2)));
     text.setAttribute("y", Double.toString(xy.y - (-h / 2)));
+    
+    this.setId(group, element);
 
     return group;
   }
 
   @Override
-  protected Node render(final ElementGroup element) {
+  protected Element render(final ElementGroup element) {
     final Element group = this.document.createElementNS(SVG_NS, "g");
 
     // create a group element
@@ -501,15 +497,16 @@ public class SVGRenderer extends AbstractRenderer<Node> {
   }
 
   @Override
-  protected Node render(final OvalElement element) {
+  protected Element render(final OvalElement element) {
     final Element circle = this.document.createElementNS(SVG_NS, "circle");
     final Point2d center = this.XY(element.xCoord, element.yCoord);
+    // what about this?
     final Point2d radius = this.XY(element.radius, element.radius);
     circle.setAttribute("cx", String.valueOf(center.x));
     circle.setAttribute("cy", String.valueOf(center.y));
     // Compute radius
     Double maxDist = 0.;
-    final IRing ring = (IRing)element.getRelatedChemicalObject();
+    final IRing ring = (IRing) element.getChemicalObject();
     final IAtom refAtom = ring.getAtom(0);
     Point2d refPoint = this.XY(refAtom.getPoint2d().x, refAtom.getPoint2d().y);
     for (IAtom atom: ring.atoms()) {
@@ -524,5 +521,18 @@ public class SVGRenderer extends AbstractRenderer<Node> {
     circle.setAttribute("fill-opacity", "0.0");
     this.setStroke(circle);
     return circle;
+  }
+
+  @Override
+  protected Element render(MarkedElement element) {
+    Element n = null;
+    try {
+      n = (Element) this.render(element.element());
+    } catch(UnsupportedOperationException e) {
+      System.out.println(element.element());
+      e.printStackTrace();
+    }
+    
+    return n;
   }
 }

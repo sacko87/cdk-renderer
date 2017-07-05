@@ -1,8 +1,13 @@
 
-package com.progressiveaccess.cdkRenderer;
+package com.progressiveaccess.cdk.renderer;
 
 
-import com.progressiveaccess.cdkRenderer.generators.BasicAtomGenerator;
+import com.progressiveaccess.cdk.renderer.Cli;
+import com.progressiveaccess.cdk.renderer.FileHandler;
+import com.progressiveaccess.cdk.renderer.SVGRenderer;
+import com.progressiveaccess.cdk.renderer.generators.LinkedAtomGenerator;
+import com.progressiveaccess.cdk.renderer.generators.LinkedBondGenerator;
+import com.progressiveaccess.cdk.renderer.generators.LinkedSceneGenerator;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
@@ -11,8 +16,6 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.generators.BasicBondGenerator;
-import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.w3c.dom.Document;
 
@@ -54,16 +57,16 @@ public class SVGRendererTest {
 
     // create the "generators"
     final List<IGenerator<IAtomContainer>> generators = new ArrayList<>();
-    generators.add(new BasicSceneGenerator());
-    generators.add(new BasicBondGenerator());
-    generators.add(new BasicAtomGenerator());
+    generators.add(new LinkedSceneGenerator());
+    generators.add(new LinkedBondGenerator());
+    generators.add(new LinkedAtomGenerator());
 
     // setup the renderer
     this.renderer = new SVGRenderer(rendererModel, generators);
     // add my options
     this.renderer.getModel().set(
-        BasicAtomGenerator.ShowExplicitHydrogens.class, true);
-    this.renderer.getModel().set(BasicAtomGenerator.ShowEndCarbons.class, true);
+        LinkedAtomGenerator.ShowExplicitHydrogens.class, true);
+    this.renderer.getModel().set(LinkedAtomGenerator.ShowEndCarbons.class, true);
   }
 
 
@@ -204,7 +207,7 @@ public class SVGRendererTest {
       Method buildCML = null;
       try {
         buildCML = Class.forName(
-            "com.progressiveaccess.cdkRenderer.FileHandler").
+            "com.progressiveaccess.cdk.renderer.FileHandler").
             getDeclaredMethod("buildCML", params);
       } catch (final ClassNotFoundException e) {
         System.out.println("Class Error " + e.getMessage());

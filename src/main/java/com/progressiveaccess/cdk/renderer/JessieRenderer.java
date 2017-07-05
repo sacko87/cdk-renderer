@@ -1,20 +1,22 @@
 //
 
-package com.progressiveaccess.cdkRenderer;
+package com.progressiveaccess.cdk.renderer;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.elements.AtomSymbolElement;
-import org.openscience.cdk.renderer.elements.ElementGroup;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
-import org.openscience.cdk.renderer.elements.LineElement;
-import org.openscience.cdk.renderer.elements.WedgeLineElement;
+import org.openscience.cdk.renderer.elements.MarkedElement;
 import org.openscience.cdk.renderer.generators.IGenerator;
+
+import com.progressiveaccess.cdk.renderer.elements.AtomSymbolElement;
+import com.progressiveaccess.cdk.renderer.elements.ElementGroup;
+import com.progressiveaccess.cdk.renderer.elements.LineElement;
+import com.progressiveaccess.cdk.renderer.elements.OvalElement;
+import com.progressiveaccess.cdk.renderer.elements.WedgeLineElement;
 
 import java.util.List;
 
 import javax.vecmath.Point2d;
-import org.openscience.cdk.renderer.elements.OvalElement;
 
 /**
  * Renders output for Jessie. This is highly experimental and incomplete!
@@ -54,13 +56,13 @@ public class JessieRenderer extends AbstractRenderer<String> {
   @Override
   protected String render(final WedgeLineElement element) {
     System.out.println("WedgeLineElement: "
-        + element.getRelatedChemicalObject());
+        + element.getChemicalObject());
     return "";
   }
 
   @Override
   protected String render(final LineElement element) {
-    System.out.println("LineElement: " + element.getRelatedChemicalObject());
+    System.out.println("LineElement: " + element.getChemicalObject());
     String result = "";
     final Point2d start = this.XY(element.firstPointX, element.firstPointY);
     final Point2d end = this.XY(element.secondPointX, element.secondPointY);
@@ -76,7 +78,7 @@ public class JessieRenderer extends AbstractRenderer<String> {
 
   @Override
   protected String render(final ElementGroup element) {
-    System.out.println("ElementGroup: " + element.getRelatedChemicalObject());
+    System.out.println("ElementGroup: " + element.getChemicalObject());
     String result = "";
     for (final IRenderingElement e : element) {
       result += this.render(e);
@@ -87,9 +89,9 @@ public class JessieRenderer extends AbstractRenderer<String> {
   @Override
   protected String render(final AtomSymbolElement element) {
     System.out.println("AtomSymbolElement: "
-        + element.getRelatedChemicalObject());
+        + element.getChemicalObject());
     final Point2d xy = this.XY(element.xCoord, element.yCoord);
-    final String id = element.getRelatedChemicalObject().getID();
+    final String id = element.getChemicalObject().getID();
     return String.format("\npoint(%f, %f) << id: '%s', name: '%s'>>;",
         xy.x, xy.y, id, element.text);
   }
@@ -106,6 +108,12 @@ public class JessieRenderer extends AbstractRenderer<String> {
 
   @Override
   protected void setStroke(final String element) {
+  }
+
+  @Override
+  protected String render(MarkedElement element) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
